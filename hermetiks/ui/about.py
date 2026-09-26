@@ -12,7 +12,7 @@ THIRD_PARTY = [
     ("Python", "PSF-2.0"), ("Tcl/Tk", "Tcl/Tk license"), ("NumPy", "BSD-3-Clause"),
     ("sounddevice / PortAudio", "MIT"), ("SoundFile / libsndfile", "BSD-3-Clause / LGPL-2.1"),
     ("PyAV / FFmpeg", "BSD-3-Clause / LGPL-3.0-or-later"), ("Pillow", "MIT-CMU (HPND)"),
-    ("pystray", "LGPL-3.0"), ("pycaw / comtypes", "MIT"), ("yt-dlp", "Unlicense"),
+    ("pystray", "LGPL-3.0"), ("pycaw / comtypes", "MIT"), ("pywinrt", "MIT"), ("yt-dlp", "Unlicense"),
     ("BBH Bartle (font)", "SIL OFL 1.1"), ("Rethink Sans (font)", "SIL OFL 1.1"),
 ]
 

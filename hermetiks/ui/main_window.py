@@ -5,7 +5,7 @@ from tkinter import filedialog, messagebox, simpledialog, ttk
 
 from PIL import Image, ImageTk
 
-from ..core import importer, mixer, startup
+from ..core import importer, log, mixer, startup
 from ..core.effects import DEFAULT_FX
 from ..core.hotkeys import key_name
 from ..core.slots import MODES, SLOTS, SLOT_IDS
@@ -222,9 +222,47 @@ class MainWindow:
         checkbox(opts, t("opt.suppress"), self.suppress, self.options_changed).pack(side="left", padx=(0, 16))
         checkbox(opts, t("opt.close_tray"), self.close_tray, self.options_changed).pack(side="left", padx=(0, 16))
         checkbox(opts, t("opt.startup"), self.startup, self.options_changed).pack(side="left")
+        self._build_nowplaying(foot)
         self.status_lbl = tk.Label(foot, text="", bg=BG, fg=MUTED, font=font(8), anchor="w")
-        self.status_lbl.grid(row=5, column=0, columnspan=3, sticky="w", pady=(8, 0))
+        self.status_lbl.grid(row=6, column=0, columnspan=3, sticky="w", pady=(8, 0))
         self.set_status(*(self._status or (None, {})))
+
+    def _build_nowplaying(self, foot):
+        box = tk.Frame(foot, bg=BG)
+        box.grid(row=5, column=0, columnspan=3, sticky="w", pady=(12, 0))
+        self.np_var = tk.BooleanVar(value=bool(self.s.nowplaying))
+        checkbox(box, t("np.label"), self.np_var, self.toggle_nowplaying).pack(side="left")
+        self.np_url = tk.StringVar(value=self.s.nowplaying.url if self.s.nowplaying else "")
+        self.np_entry = tk.Entry(box, textvariable=self.np_url, state="readonly", readonlybackground=KEY, fg=WHITE,
+                                 relief="flat", font=font(9), width=26)
+        self.np_copy = button(box, t("np.copy"), self.copy_nowplaying)
+        if self.s.nowplaying:
+            self.np_entry.pack(side="left", padx=(12, 6), ipady=3)
+            self.np_copy.pack(side="left")
+        tk.Label(foot, text=t("np.hint"), bg=BG, fg=MUTED, font=font(8), anchor="w").grid(
+            row=5, column=0, columnspan=3, sticky="w", pady=(48, 0))
+
+    def toggle_nowplaying(self):
+        try:
+            url = self.s.set_nowplaying(self.np_var.get())
+        except Exception as ex:  # noqa: BLE001
+            self.np_var.set(False)
+            self.set_status("np.error", {"detail": str(ex)})
+            return
+        self.cfg["nowplaying"] = bool(url)
+        self.cfg.save()
+        self.np_url.set(url or "")
+        self.np_entry.pack_forget()
+        self.np_copy.pack_forget()
+        if url:
+            self.np_entry.pack(side="left", padx=(12, 6), ipady=3)
+            self.np_copy.pack(side="left")
+
+    def copy_nowplaying(self):
+        self.root.clipboard_clear()
+        self.root.clipboard_append(self.np_url.get())
+        self.np_copy.config(text=t("np.copied"))
+        self.root.after(1400, lambda: self.np_copy.config(text=t("np.copy")))
 
     # ---- status / language ------------------------------------------------------------------
     def set_status(self, key, params=None):
@@ -442,24 +480,28 @@ class MainWindow:
             self.refresh_all_buttons()
             self.select(self.selected)
         elif kind == "show":
+            log.info("show event from tray")
             self.root.deiconify()
             self.root.lift()
         elif kind == "toggle":
             self.active.set(not self.active.get())
             self.options_changed()
         elif kind == "quit":
+            log.info("quit event from tray")
             self.quit()
             return True
         return False
 
     # ---- window lifecycle ---------------------------------------------------------------------
     def on_close(self):
+        log.info("window close requested (close_tray=%s)", self.cfg["close_tray"])
         if self.cfg["close_tray"] and self.tray:
             self.root.withdraw()
         else:
             self.quit()
 
     def quit(self):
+        log.info("quit")
         self._alive = False
         self.s.shutdown()
         if self.tray:

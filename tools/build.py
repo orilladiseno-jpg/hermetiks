@@ -49,6 +49,8 @@ def version_file():
 
 
 def pyinstaller():
+    for tool in ("sync_overlay.py", "build_overlay_html.py"):
+        subprocess.check_call([sys.executable, os.path.join(ROOT, "tools", tool)])
     res = os.path.join("hermetiks", "resources")
     shutil.copy2(os.path.join(ROOT, "LICENSE"), os.path.join(ROOT, res, "LICENSE.txt"))
     args = [sys.executable, "-m", "PyInstaller", "--noconfirm", "--clean", "--windowed", "--name", "Hermetiks",
@@ -60,6 +62,8 @@ def pyinstaller():
             "--add-data", f"{os.path.join(ROOT, 'PRIVACY.md')};.",
             "--collect-all", "sounddevice", "--collect-all", "soundfile", "--collect-all", "av",
             "--collect-all", "yt_dlp", "--collect-all", "pycaw", "--hidden-import", "pystray._win32",
+            "--collect-all", "winrt.runtime", "--collect-all", "winrt.windows.foundation",
+            "--collect-all", "winrt.windows.media.control", "--collect-all", "winrt.windows.storage.streams",
             "--exclude-module", "matplotlib", "--exclude-module", "scipy", "--exclude-module", "pandas",
             "--exclude-module", "pytest", os.path.join(ROOT, "run.py")]
     subprocess.check_call(args, cwd=ROOT)

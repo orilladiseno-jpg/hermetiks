@@ -14,6 +14,7 @@ from . import audio, effects, importer, mixer
 from .config import Config, sounds_dir
 from .ducking import Ducker
 from .hotkeys import Hook
+from .nowplaying import NowPlaying
 from .slots import DEFAULT_KEYS, ESCAPE_KEY, NO_KEY, SLOT_IDS
 
 
@@ -28,6 +29,7 @@ class Session:
         self.capture = None
         self.hook = None
         self.ducker = None
+        self.nowplaying = None
         os.makedirs(sounds_dir(), exist_ok=True)
 
     # -- lifecycle -------------------------------------------------------------------------
@@ -38,8 +40,14 @@ class Session:
         self.hook.start()
         self.ducker = Ducker(lambda: self.cfg.data, lambda: any(o.busy for o in self.outs))
         self.ducker.start()
+        if self.cfg["nowplaying"]:
+            try:
+                self.set_nowplaying(True)
+            except Exception as ex:  # noqa: BLE001
+                self.events.put(("status", "np.error", {"detail": str(ex)}))
 
     def shutdown(self):
+        self.set_nowplaying(False)
         if self.hook:
             self.hook.stop()
         if self.ducker:
@@ -47,6 +55,18 @@ class Session:
         for o in self.outs:
             o.close()
         self.outs = []
+
+    # -- now playing overlay ------------------------------------------------------------
+    def set_nowplaying(self, enabled):
+        """Start or stop the local OBS overlay server. Returns its URL, or None when off."""
+        if enabled and self.nowplaying is None:
+            service = NowPlaying(self.cfg["nowplaying_port"])
+            service.start()
+            self.nowplaying = service
+        elif not enabled and self.nowplaying is not None:
+            self.nowplaying.stop()
+            self.nowplaying = None
+        return self.nowplaying.url if self.nowplaying else None
 
     # -- keys --------------------------------------------------------------------------------
     def slot_key(self, slot):

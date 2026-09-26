@@ -10,6 +10,9 @@ HERMETIKS Soundboard is designed to work entirely on your computer.
   (a direct audio URL, or a page supported by yt-dlp such as YouTube). Nothing else is sent anywhere.
 - **Other apps' volume.** If you enable Duck, the app temporarily lowers the volume of the
   applications you list (default: `spotify.exe`) through the Windows audio session API, and restores it afterwards.
+- **Now Playing overlay (optional).** If you enable it, the app reads the current track from the Windows media
+  controls (for example Spotify desktop) and serves it to a local web page for OBS at `http://127.0.0.1:<port>`.
+  The server listens on the loopback address only and rejects requests for other host names; nothing is sent over the network.
 - **Local files.** Settings and imported sounds are stored in `%APPDATA%\Hermetiks`. The uninstaller
   offers to remove them.
 

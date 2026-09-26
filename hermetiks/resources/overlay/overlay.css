@@ -1,0 +1,38 @@
+/* HERMETIKS Now Playing overlay. Black / white / greys. Shared by the app's local server and the website widget. */
+@font-face { font-family: "Rethink Sans"; src: url("fonts/RethinkSans-Medium.ttf") format("truetype"); font-weight: 500; font-display: swap; }
+@font-face { font-family: "Rethink Sans"; src: url("fonts/RethinkSans-Bold.ttf") format("truetype"); font-weight: 700; font-display: swap; }
+
+:root { --scale: 1; }
+html, body.overlay { margin: 0; background: transparent; overflow: hidden; }
+body.overlay { font-family: "Rethink Sans", system-ui, "Segoe UI", "Microsoft YaHei", sans-serif; -webkit-font-smoothing: antialiased; }
+[hidden] { display: none !important; }
+
+.stage { display: flex; flex-direction: column; align-items: center; gap: 12px; width: max-content; padding: 14px; transform: scale(var(--scale)); transform-origin: top left; }
+.np {
+  display: flex; align-items: center; gap: 20px; width: 580px; padding: 16px; border-radius: 22px; box-sizing: border-box;
+  background: rgba(10, 10, 10, .66); border: 1px solid rgba(255, 255, 255, .1); box-shadow: 0 24px 60px rgba(0, 0, 0, .38);
+  transition: opacity .7s ease, transform .7s cubic-bezier(.2, .7, .2, 1);
+}
+.np.hide { opacity: 0; transform: translateY(10px); }
+.np.swap .cover, .np.swap .meta { opacity: 0; transform: translateX(-8px); }
+.cover { width: 136px; height: 136px; flex: none; border-radius: 13px; object-fit: cover; background: #161616; box-shadow: 0 12px 30px rgba(0, 0, 0, .55); transition: opacity .35s, transform .35s; }
+.meta { min-width: 0; flex: 1; transition: opacity .35s, transform .35s; }
+.title, .artist { overflow: hidden; white-space: nowrap; }
+.title span, .artist span { display: inline-block; }
+.title { font-size: 31px; font-weight: 700; line-height: 1.2; color: #fff; letter-spacing: -.01em; text-shadow: 0 2px 14px rgba(0, 0, 0, .5); }
+.artist { margin-top: 4px; font-size: 22px; font-weight: 500; line-height: 1.3; color: #c4c4c4; text-shadow: 0 2px 12px rgba(0, 0, 0, .5); }
+.scroll span { animation: marq 9s linear infinite alternate; animation-delay: 1.5s; }
+@keyframes marq { from { transform: translateX(0); } to { transform: translateX(calc(-1 * var(--d, 0px))); } }
+.bar { height: 4px; margin-top: 18px; border-radius: 4px; background: rgba(255, 255, 255, .14); overflow: hidden; }
+.bar i { display: block; height: 100%; width: 0; background: #fff; border-radius: 4px; }
+.brand { height: 58px; width: auto; opacity: .38; }
+.no-panel .np { background: transparent; border-color: transparent; box-shadow: none; }
+
+.stack .np { flex-direction: column; align-items: stretch; width: 320px; text-align: center; }
+.stack .cover { width: 100%; height: auto; aspect-ratio: 1; }
+.stack .title { font-size: 26px; } .stack .artist { font-size: 19px; }
+.stack .bar { margin-top: 14px; }
+
+.err { margin: 0; padding: 8px 14px; border-radius: 10px; background: rgba(10, 10, 10, .8); border: 1px solid #333; color: #d9d9d9; font-size: 15px; max-width: 580px; }
+
+@media (prefers-reduced-motion: reduce) { .scroll span { animation: none; } .np { transition: none; } }

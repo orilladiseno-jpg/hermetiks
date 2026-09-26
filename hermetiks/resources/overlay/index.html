@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HERMETIKS Now Playing</title>
+  <link rel="stylesheet" href="overlay.css">
+</head>
+<body class="overlay" data-source="local">
+<div class="stage" id="stage" hidden>
+  <div class="np hide" id="np" aria-live="polite">
+    <img class="cover" id="cover" alt="">
+    <div class="meta">
+      <div class="title" id="title"><span></span></div>
+      <div class="artist" id="artist"><span></span></div>
+      <div class="bar"><i id="bar"></i></div>
+    </div>
+  </div>
+  <img class="brand" src="lockup-white.svg" alt="HERMETIKS Soundboard" height="58">
+  <p class="err" id="err" hidden></p>
+</div>
+<script src="overlay.js"></script>
+</body>
+</html>

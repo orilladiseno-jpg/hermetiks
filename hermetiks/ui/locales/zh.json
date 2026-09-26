@@ -76,5 +76,10 @@
   "about.third": "第三方组件",
   "about.license_btn": "查看许可证",
   "about.website_btn": "网站",
-  "about.close": "关闭"
+  "about.close": "关闭",
+  "np.label": "OBS 正在播放浮层（Spotify 桌面版）",
+  "np.copy": "复制链接",
+  "np.copied": "已复制",
+  "np.hint": "在 OBS 中添加“浏览器”来源并填入此链接，大小 640 x 240。加 ?layout=stack 可显示为竖版卡片。",
+  "np.error": "无法启动“正在播放”浮层：{detail}"
 }

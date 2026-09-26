@@ -187,3 +187,13 @@ details p { color: var(--muted); padding: 0 40px 22px 0; margin: 0; }
   .rv { opacity: 1; transform: none; transition: none; }
   .window, .hero-shot:hover .window { transform: none; transition: none; }
 }
+
+/* downloads + badge */
+.dl { display: flex; flex-direction: column; align-items: flex-start; }
+.dl .btn { margin-top: 22px; }
+.dl p { flex: 1; }
+.vt { display: inline-flex; align-items: center; gap: 9px; margin-top: 18px; font-size: 14px; color: var(--muted); text-decoration: none; border: 1px solid var(--line-2); border-radius: 999px; padding: 7px 14px; line-height: 1.3; }
+.vt::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--white); flex: none; }
+.vt:hover { color: var(--white); border-color: #555; }
+.dl .alt { margin-top: 12px; color: var(--muted); }
+.dl .alt:hover { color: var(--white); }

@@ -1,0 +1,23 @@
+/* Setup page for the website widget. The overlay itself lives in overlay.css (shared with the app). */
+body.np-page { min-height: 100vh; }
+body.np-page::before { display: none; } /* no film grain on the overlay */
+body.setup-mode { overflow-y: auto; }
+
+/* ---- setup page ---- */
+.setup { padding: 56px 0 90px; }
+.brand-link { display: inline-flex; align-items: center; gap: 12px; text-decoration: none; color: #fff; font-family: var(--display); margin-bottom: 44px; }
+.setup h1 { font-size: clamp(32px, 5vw, 52px); margin-bottom: 18px; }
+.setup h2 { font-size: 28px; margin: 26px 0 10px; }
+.how { padding-left: 0; list-style: none; counter-reset: st; margin: 30px 0 14px; }
+.how li { counter-increment: st; position: relative; padding: 0 0 26px 54px; color: #b3b3b3; }
+.how li::before { content: counter(st); position: absolute; left: 0; top: -2px; width: 34px; height: 34px; display: grid; place-items: center; border: 1px solid #333; border-radius: 50%; font-family: var(--display); color: #fff; font-size: 14px; }
+.how a { color: #fff; }
+.how input, textarea#obsUrl {
+  display: block; width: 100%; margin-top: 12px; padding: 13px 16px; background: #121212; color: #fff; border: 1px solid #333; border-radius: 12px; font: inherit; font-size: 16px;
+}
+textarea#obsUrl { font-family: ui-monospace, Consolas, monospace; font-size: 13px; resize: vertical; margin-bottom: 16px; word-break: break-all; }
+.copyrow { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 12px; }
+.copyrow small { color: #8a8a8a; width: 100%; }
+.copyrow code { flex: 1 1 260px; overflow-wrap: anywhere; }
+.warn { color: #fff; border-left: 2px solid #fff; padding-left: 14px; margin-top: 22px; }
+.setup .err { margin-top: 18px; }

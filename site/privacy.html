@@ -27,6 +27,7 @@
     <li><b>Keyboard hook.</b> To react to your shortcuts while a game has focus, the app installs a Windows low-level keyboard hook. Each key press is only compared with your configured shortcuts and discarded. Keystrokes are never stored, logged or transmitted.</li>
     <li><b>Network access.</b> The app connects to the internet only when you import audio from a link (a direct audio URL, or a page supported by yt-dlp such as YouTube). Nothing else is sent anywhere.</li>
     <li><b>Other applications' volume.</b> If you enable Duck, the app temporarily lowers the volume of the applications you list (default: Spotify) through the Windows audio session API and restores it afterwards.</li>
+    <li><b>Now Playing overlay.</b> The overlay built into the app reads what is playing from the Windows media controls and serves it only to your own computer (127.0.0.1); nothing leaves your machine.</li>
     <li><b>Local files.</b> Settings and imported sounds are stored on your computer in <code>%APPDATA%\Hermetiks</code>. The uninstaller offers to delete them.</li>
   </ul>
 
@@ -35,7 +36,8 @@
     <li>The site sets no cookies and uses no analytics or third-party trackers.</li>
     <li>Your language choice is remembered in your browser's local storage only.</li>
     <li>The download button and version label read public release information from GitHub's API (api.github.com) in your browser. GitHub may log that request under its own <a href="https://docs.github.com/site-policy/privacy-policies/github-general-privacy-statement" rel="noopener">privacy statement</a>. Downloads are served by GitHub.</li>
-    <li>The live demo generates sounds in your browser; no audio or key presses leave your device.</li>
+    <li>The live demo plays short audio clips in your browser; no audio or key presses leave your device.</li>
+    <li>The optional web widget at /spotify/ connects your browser directly to Spotify (accounts.spotify.com and api.spotify.com) with a read-only "currently playing" permission that you grant to your own Spotify app. Its settings and tokens are stored in your browser only; we never receive them.</li>
   </ul>
 
   <h2>Contact</h2>

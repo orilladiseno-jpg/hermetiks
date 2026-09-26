@@ -15,6 +15,7 @@ projects listed and inside the corresponding Python packages.
 | Pillow | images | MIT-CMU (HPND) |
 | pystray | tray icon | LGPL-3.0 |
 | pycaw, comtypes | ducking (Windows audio sessions) | MIT |
+| pywinrt (winrt-*) | Now Playing (Windows media controls) | MIT |
 | yt-dlp | import from video/audio pages | The Unlicense |
 | BBH Bartle | wordmark typeface | SIL Open Font License 1.1 |
 | Rethink Sans | interface typeface | SIL Open Font License 1.1 |

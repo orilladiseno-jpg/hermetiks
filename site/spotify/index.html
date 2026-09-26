@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Spotify Now Playing for OBS | HERMETIKS</title>
+  <meta name="description" content="Free Spotify Now Playing overlay for OBS: song, artist and cover art with a subtle HERMETIKS mark.">
+  <meta name="robots" content="noindex">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="overlay.css">
+  <link rel="stylesheet" href="spotify.css">
+</head>
+<body class="np-page">
+
+<!-- OVERLAY: what OBS renders -->
+<div class="stage" id="stage" hidden>
+  <div class="np hide" id="np" aria-live="polite">
+    <img class="cover" id="cover" alt="">
+    <div class="meta">
+      <div class="title" id="title"><span></span></div>
+      <div class="artist" id="artist"><span></span></div>
+      <div class="bar"><i id="bar"></i></div>
+    </div>
+  </div>
+  <img class="brand" src="lockup-white.svg" alt="HERMETIKS Soundboard" height="58">
+  <p class="err" id="err" hidden></p>
+</div>
+
+<!-- SETUP: what you see in a normal browser -->
+<main class="setup wrap narrow" id="setup" hidden>
+  <a class="brand-link" href="/"><img src="../assets/img/mark.svg" alt="" width="26" height="34"><span>HERMETIKS</span></a>
+  <p class="eyebrow" data-s="eyebrow">Free extra</p>
+  <h1 data-s="title">Spotify Now Playing for OBS</h1>
+  <p class="lead" data-s="intro"></p>
+
+  <section id="stepsBox">
+    <ol class="how">
+      <li><span data-s="s1"></span> <a href="https://developer.spotify.com/dashboard" rel="noopener" target="_blank">developer.spotify.com/dashboard</a>
+        <div class="copyrow"><small data-s="uri"></small><code id="redirect"></code><button class="btn btn-sm btn-ghost" id="copyRedirect" data-s="copy">Copy</button></div></li>
+      <li><span data-s="s2"></span>
+        <input id="cid" type="text" inputmode="text" autocomplete="off" spellcheck="false" placeholder="Client ID" aria-label="Client ID"></li>
+      <li><span data-s="s3"></span>
+        <div><button class="btn" id="connect" data-s="connect">Connect Spotify</button></div></li>
+    </ol>
+    <p class="small" data-s="premium"></p>
+  </section>
+
+  <section id="doneBox" hidden>
+    <h2 data-s="doneTitle">Connected</h2>
+    <p data-s="doneText"></p>
+    <textarea id="obsUrl" readonly rows="4" aria-label="OBS URL"></textarea>
+    <div class="cta">
+      <button class="btn" id="copyUrl" data-s="copy">Copy</button>
+      <a class="btn btn-ghost" id="preview" href="#" target="_blank" rel="noopener" data-s="preview">Preview</a>
+    </div>
+    <p class="warn" data-s="warn"></p>
+    <p class="small" data-s="options"></p>
+  </section>
+  <p class="err" id="setupErr" hidden></p>
+  <p class="small"><a href="/" data-s="back">Back to HERMETIKS</a> · <a href="/privacy.html" data-s="privacy">Privacy</a></p>
+</main>
+
+<script src="overlay.js"></script>
+<script src="spotify.js"></script>
+</body>
+</html>

@@ -22,7 +22,8 @@ def default_path():
 
 DEFAULTS = dict(version=SCHEMA_VERSION, language="en", device="", monitor="", master=100, suppress=False,
                 active=True, close_tray=False, startup=False, duck=False, duck_level=25,
-                duck_apps="spotify.exe", stop_key=list(DEFAULT_STOP), profile="Main", profiles={})
+                duck_apps="spotify.exe", nowplaying=False, nowplaying_port=8765,
+                stop_key=list(DEFAULT_STOP), profile="Main", profiles={})
 
 
 class Config:

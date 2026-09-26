@@ -14,6 +14,7 @@ Free and open source (MIT). Interface in **English, Español, 中文 and Portugu
 - **Duck**: lowers Spotify (or any app you list) while a clip plays, then restores it.
 - **Profiles**: a bank of sounds per game, radio or stream.
 - **Import** files (wav, mp3, ogg, flac, opus, m4a...), direct links or YouTube.
+- **Now Playing overlay for OBS**: song, artist and cover art from Spotify desktop, with a subtle HERMETIKS mark. One checkbox, no login.
 - System tray, start with Windows, optional key blocking for the game.
 
 ## Install

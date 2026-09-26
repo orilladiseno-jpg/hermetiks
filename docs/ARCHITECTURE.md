@@ -24,6 +24,9 @@ hermetiks/ui            FRONTEND (tkinter)                hermetiks/core        
   all active voices; clips are pre-rendered, so effects cost nothing at play time.
 - **effects.render()** applies the chain: trim, speed, reverse, EQ, robot, radio, echo, reverb, normalize, volume.
   Changes are re-rendered on a worker thread; a generation counter drops stale results.
+- **NowPlaying** reads the Windows media session (pywinrt) and serves the overlay (`resources/overlay`) plus
+  `/api/now-playing` on 127.0.0.1 with an exclusive port and Host-header checks. The website widget reuses the same
+  overlay files (`tools/sync_overlay.py` copies them; a test keeps them in sync).
 - **Config** persists `%APPDATA%\Hermetiks\config.json` atomically and migrates older schemas.
 
 ## Frontend (`hermetiks/ui`)

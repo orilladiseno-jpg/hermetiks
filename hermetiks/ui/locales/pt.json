@@ -76,5 +76,10 @@
   "about.third": "Componentes de terceiros",
   "about.license_btn": "Ver licença",
   "about.website_btn": "Site",
-  "about.close": "Fechar"
+  "about.close": "Fechar",
+  "np.label": "Overlay Now Playing para OBS (Spotify desktop)",
+  "np.copy": "Copiar URL",
+  "np.copied": "Copiado",
+  "np.hint": "No OBS adicione uma fonte Navegador com esta URL, tamanho 640 x 240. Adicione ?layout=stack para um cartão vertical.",
+  "np.error": "Não foi possível iniciar o overlay Now Playing: {detail}"
 }
