@@ -20,3 +20,8 @@ in place of the screenshot; without the file the screenshot is used. Replace `as
 
 ## Languages
 Texts live in `assets/js/i18n.js` (English, Spanish, Chinese, Portuguese). Add a key to all four languages when adding text.
+
+## Demo sounds
+The numpad demo plays the MP3 files in `assets/audio/` (jingle, station, weather, headlines, applause, drop, sting, outro, static, onair).
+They are original: voices generated with Kokoro TTS (Apache-2.0) and processed with HERMETIKS' own effects chain; applause and static are synthesized.
+To use your own, replace the files keeping the same names (mono or stereo MP3, under ~100 KB each). Only use audio you have the rights to publish.

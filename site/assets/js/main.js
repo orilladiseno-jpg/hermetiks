@@ -68,13 +68,15 @@
   /* ---------- live demo: synthesized sounds, nothing is downloaded ---------- */
   var pad = $("#pad");
   if (!pad) return;
-  var ctx, master, analyser, active = [];
+  var FILES = { "1": "jingle", "2": "station", "3": "weather", "4": "headlines", "5": "applause",
+                "6": "drop", "7": "sting", "8": "outro", "9": "static", "0": "onair" };
+  var ctx, master, analyser, active = [], raw = {}, bufs = {};
   function audio() {
     if (!ctx) {
       var AC = window.AudioContext || window.webkitAudioContext;
       if (!AC) return null;
       ctx = new AC();
-      master = ctx.createGain(); master.gain.value = 0.55;
+      master = ctx.createGain(); master.gain.value = 0.9;
       analyser = ctx.createAnalyser(); analyser.fftSize = 1024;
       master.connect(analyser); analyser.connect(ctx.destination);
       draw();
@@ -82,42 +84,19 @@
     if (ctx.state === "suspended") ctx.resume();
     return ctx;
   }
-  function env(g, t, a, d, peak) {
-    g.gain.setValueAtTime(0.0001, t);
-    g.gain.exponentialRampToValueAtTime(peak, t + a);
-    g.gain.exponentialRampToValueAtTime(0.0001, t + a + d);
+  /* the MP3 files are fetched once the demo comes near the viewport, decoded on the first key press */
+  function fetchAll() {
+    Object.keys(FILES).forEach(function (k) {
+      if (raw[k]) return;
+      raw[k] = fetch("assets/audio/" + FILES[k] + ".mp3").then(function (r) { return r.ok ? r.arrayBuffer() : null; }).catch(function () { return null; });
+    });
   }
-  function tone(type, f0, f1, t, dur, peak) {
-    var o = ctx.createOscillator(), g = ctx.createGain();
-    o.type = type; o.frequency.setValueAtTime(f0, t);
-    if (f1) o.frequency.exponentialRampToValueAtTime(f1, t + dur);
-    env(g, t, 0.01, dur, peak);
-    o.connect(g); g.connect(master); o.start(t); o.stop(t + dur + 0.05); active.push(o);
+  function buffer(k) {
+    if (bufs[k]) return bufs[k];
+    fetchAll();
+    bufs[k] = raw[k].then(function (ab) { return ab ? new Promise(function (ok, no) { ctx.decodeAudioData(ab, ok, no); }) : null; }).catch(function () { return null; });
+    return bufs[k];
   }
-  var noiseBuf;
-  function noise(t, dur, peak, lo, hi) {
-    if (!noiseBuf) {
-      noiseBuf = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate);
-      var d = noiseBuf.getChannelData(0); for (var i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
-    }
-    var s = ctx.createBufferSource(); s.buffer = noiseBuf;
-    var f = ctx.createBiquadFilter(); f.type = "bandpass"; f.frequency.value = (lo + hi) / 2; f.Q.value = (lo + hi) / 2 / Math.max(hi - lo, 1);
-    var g = ctx.createGain(); env(g, t, 0.02, dur, peak);
-    s.connect(f); f.connect(g); g.connect(master); s.start(t); s.stop(t + dur + 0.1); active.push(s);
-  }
-  var N = { C5: 523.25, E5: 659.25, G5: 783.99, C6: 1046.5, A4: 440, D5: 587.33, F5: 698.46, B4: 493.88 };
-  var voices = {
-    "1": function (t) { [N.C5, N.E5, N.G5, N.C6].forEach(function (f, i) { tone("triangle", f, 0, t + i * 0.11, 0.5, 0.35); }); },
-    "2": function (t) { noise(t, 0.35, 0.25, 900, 2600); tone("sine", 1000, 0, t + 0.05, 0.16, 0.3); tone("sine", 1400, 0, t + 0.28, 0.2, 0.3); },
-    "3": function (t) { [N.C5, N.E5, N.G5].forEach(function (f) { tone("sine", f / 2, 0, t, 1.6, 0.22); }); },
-    "4": function (t) { tone("sawtooth", 220, 660, t, 0.45, 0.16); tone("sawtooth", 330, 990, t, 0.45, 0.12); noise(t + 0.4, 0.4, 0.12, 2000, 6000); },
-    "5": function (t) { for (var i = 0; i < 26; i++) noise(t + Math.random() * 1.6, 0.06 + Math.random() * 0.08, 0.18, 1500, 5500); },
-    "6": function (t) { tone("sine", 180, 38, t, 0.7, 0.7); noise(t, 0.12, 0.25, 100, 400); },
-    "7": function (t) { tone("sawtooth", N.C5, 0, t, 0.5, 0.2); tone("sawtooth", N.G5, 0, t, 0.5, 0.16); tone("sawtooth", N.C6, 0, t, 0.5, 0.12); },
-    "8": function (t) { [N.G5, N.E5, N.D5, N.C5].forEach(function (f, i) { tone("triangle", f, 0, t + i * 0.13, 0.55, 0.3); }); },
-    "9": function (t) { noise(t, 1.2, 0.3, 300, 7000); },
-    "0": function (t) { tone("sawtooth", 233, 0, t, 0.9, 0.22); tone("sawtooth", 277, 0, t, 0.9, 0.18); tone("square", 349, 0, t, 0.9, 0.08); }
-  };
   function stopAll() {
     active.forEach(function (n) { try { n.stop(); } catch (e) {} });
     active = [];
@@ -129,7 +108,19 @@
   function play(k) {
     if (!audio()) return;
     if (k === ".") { stopAll(); flash(k); return; }
-    if (voices[k]) { voices[k](ctx.currentTime + 0.01); flash(k); }
+    if (!FILES[k]) return;
+    flash(k);
+    Object.keys(FILES).forEach(buffer); /* warm every clip on first use */
+    buffer(k).then(function (buf) {
+      if (!buf) return;
+      var s = ctx.createBufferSource(); s.buffer = buf; s.connect(master); s.start();
+      active.push(s);
+      s.onended = function () { active = active.filter(function (n) { return n !== s; }); };
+    });
+  }
+  if ("IntersectionObserver" in window) {
+    var near = new IntersectionObserver(function (es) { if (es[0].isIntersecting) { fetchAll(); near.disconnect(); } }, { rootMargin: "600px" });
+    near.observe(pad);
   }
   pad.addEventListener("click", function (e) { var b = e.target.closest(".key"); if (b) play(b.getAttribute("data-key")); });
   document.addEventListener("keydown", function (e) {
