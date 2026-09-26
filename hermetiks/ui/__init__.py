@@ -5,7 +5,7 @@ import sys
 import tkinter as tk
 
 from .. import __version__
-from ..core import log
+from ..core import instance, log, power
 from ..core.config import Config
 from ..core.session import Session
 from . import i18n, theme
@@ -22,6 +22,12 @@ def run(argv=None):
     except Exception:  # noqa: BLE001
         pass
     log.setup()
+    if not instance.acquire():
+        log.info("already running; not starting a second copy")
+        if "--min" not in argv:
+            instance.focus_existing()
+        return
+    power.keep_responsive()
     log.info("start v%s argv=%s", __version__, argv)
     theme.load_fonts()
     config = Config()

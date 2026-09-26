@@ -3,8 +3,8 @@
 HERMETIKS Soundboard is designed to work entirely on your computer.
 
 - **No data collection.** No accounts, no analytics, no telemetry, no advertising.
-- **Keyboard hook.** To react to your shortcuts while a game has focus, the app installs a Windows
-  low-level keyboard hook. Each key press is only compared with your configured shortcuts and
+- **Keyboard input.** To react to your shortcuts while a game has focus, the app reads keyboard events through Windows Raw Input
+  (and, only if you enable "Block keys for the game", a low-level keyboard hook). Each key press is only compared with your configured shortcuts and
   discarded. Keystrokes are never stored, logged or transmitted.
 - **Network access.** The app only connects to the internet when *you* import audio from a link
   (a direct audio URL, or a page supported by yt-dlp such as YouTube). Nothing else is sent anywhere.

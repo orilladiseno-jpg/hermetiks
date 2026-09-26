@@ -11,10 +11,12 @@ Free and open source (MIT). Interface in **English, Español, 中文 and Portugu
 - **Output you choose** (WASAPI, low latency) plus an optional monitor. Pick `CABLE Input` ([VB-CABLE](https://vb-audio.com/Cable/)) as the output so friends hear it in voice chat.
 - **Per-key sound design**: volume, speed/pitch, trim with waveform, bass/treble, echo, reverb, old radio, robot, reverse, normalize.
 - **Modes**: normal, hold-to-play, loop.
-- **Duck**: lowers Spotify (or any app you list) while a clip plays, then restores it.
+- **Smooth duck**: fades Spotify (or any app you list, on any output device) down and back up while a clip plays.
 - **Profiles**: a bank of sounds per game, radio or stream.
 - **Import** files (wav, mp3, ogg, flac, opus, m4a...), direct links or YouTube.
 - **Now Playing overlay for OBS**: song, artist and cover art from Spotify desktop, with a subtle HERMETIKS mark. One checkbox, no login.
+- **Mini overlay** for streamers: a small click-through panel (top right) that lists your sounds and lights up the one playing.
+- Always works in the background: minimized, in the tray or behind a game.
 - System tray, start with Windows, optional key blocking for the game.
 
 ## Install

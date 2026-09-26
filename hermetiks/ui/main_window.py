@@ -1,17 +1,20 @@
 """Main window. Pure presentation: every action is delegated to the Session (backend)."""
 import queue
+import shutil
 import tkinter as tk
 from tkinter import filedialog, messagebox, simpledialog, ttk
 
 from PIL import Image, ImageTk
 
 from ..core import importer, log, mixer, startup
+import webbrowser
 from ..core.effects import DEFAULT_FX
 from ..core.hotkeys import key_name
 from ..core.slots import MODES, SLOTS, SLOT_IDS
 from ..paths import resource
 from . import theme
 from .about import About
+from .hud import Hud
 from .i18n import LANGUAGES, language, set_language, t
 from .theme import BG, KEY, KEY_HI, MUTED, PANEL, TEXT, WHITE, button, caption, checkbox, font, slider
 from .tray import Tray
@@ -38,8 +41,11 @@ class MainWindow:
         self._job = None
         self._status = None
         self._alive = True
+        self.hud = Hud(root, session)
         self._build()
         self.s.start()
+        self.hud.set_enabled(self.cfg["hud"])
+        self._sync_nowplaying_ui()
         self.reopen_outputs()
         self.select(self.selected)
         try:
@@ -219,9 +225,11 @@ class MainWindow:
         self.close_tray = tk.BooleanVar(value=self.cfg["close_tray"])
         self.cfg["startup"] = startup.is_enabled()
         self.startup = tk.BooleanVar(value=self.cfg["startup"])
+        self.hud_var = tk.BooleanVar(value=self.cfg["hud"])
         checkbox(opts, t("opt.suppress"), self.suppress, self.options_changed).pack(side="left", padx=(0, 16))
         checkbox(opts, t("opt.close_tray"), self.close_tray, self.options_changed).pack(side="left", padx=(0, 16))
-        checkbox(opts, t("opt.startup"), self.startup, self.options_changed).pack(side="left")
+        checkbox(opts, t("opt.startup"), self.startup, self.options_changed).pack(side="left", padx=(0, 16))
+        checkbox(opts, t("opt.hud"), self.hud_var, self.options_changed).pack(side="left")
         self._build_nowplaying(foot)
         self.status_lbl = tk.Label(foot, text="", bg=BG, fg=MUTED, font=font(8), anchor="w")
         self.status_lbl.grid(row=6, column=0, columnspan=3, sticky="w", pady=(8, 0))
@@ -236,9 +244,9 @@ class MainWindow:
         self.np_entry = tk.Entry(box, textvariable=self.np_url, state="readonly", readonlybackground=KEY, fg=WHITE,
                                  relief="flat", font=font(9), width=26)
         self.np_copy = button(box, t("np.copy"), self.copy_nowplaying)
-        if self.s.nowplaying:
-            self.np_entry.pack(side="left", padx=(12, 6), ipady=3)
-            self.np_copy.pack(side="left")
+        self.np_save = button(box, t("np.save"), self.save_nowplaying_html)
+        self.np_view = button(box, t("np.preview"), lambda: webbrowser.open(self.np_url.get() + "?demo=1"))
+        self._show_nowplaying_controls(bool(self.s.nowplaying))
         tk.Label(foot, text=t("np.hint"), bg=BG, fg=MUTED, font=font(8), anchor="w").grid(
             row=5, column=0, columnspan=3, sticky="w", pady=(48, 0))
 
@@ -252,11 +260,30 @@ class MainWindow:
         self.cfg["nowplaying"] = bool(url)
         self.cfg.save()
         self.np_url.set(url or "")
-        self.np_entry.pack_forget()
-        self.np_copy.pack_forget()
-        if url:
+        self._show_nowplaying_controls(bool(url))
+
+    def _sync_nowplaying_ui(self):
+        """The overlay server starts with the session, after the widgets were built: reflect its real state."""
+        url = self.s.nowplaying.url if self.s.nowplaying else ""
+        self.np_var.set(bool(url))
+        self.np_url.set(url)
+        self._show_nowplaying_controls(bool(url))
+
+    def _show_nowplaying_controls(self, on):
+        for w in (self.np_entry, self.np_copy, self.np_save, self.np_view):
+            w.pack_forget()
+        if on:
             self.np_entry.pack(side="left", padx=(12, 6), ipady=3)
-            self.np_copy.pack(side="left")
+            self.np_copy.pack(side="left", padx=(0, 6))
+            self.np_save.pack(side="left", padx=(0, 6))
+            self.np_view.pack(side="left")
+
+    def save_nowplaying_html(self):
+        path = filedialog.asksaveasfilename(title=t("np.dialog"), defaultextension=".html", initialfile="hermetiks-nowplaying.html",
+                                            filetypes=[("HTML", "*.html")])
+        if path:
+            shutil.copyfile(resource("overlay", "hermetiks-nowplaying.html"), path)
+            self.set_status("np.saved", {"path": path})
 
     def copy_nowplaying(self):
         self.root.clipboard_clear()
@@ -292,6 +319,9 @@ class MainWindow:
         c = self.cfg
         c["active"], c["suppress"] = self.active.get(), self.suppress.get()
         c["close_tray"], c["duck"] = self.close_tray.get(), self.duck.get()
+        c["hud"] = self.hud_var.get()
+        self.hud.set_enabled(c["hud"])
+        self.s.set_suppress(c["suppress"])
         c["master"], c["duck_level"], c["duck_apps"] = self.master_var.get(), self.duck_level.get(), self.duck_apps.get()
         device, monitor = self.device_var.get(), self.monitor_var.get()
         c["device"] = "" if device == t("output.default") else device
@@ -319,6 +349,7 @@ class MainWindow:
     def refresh_all_buttons(self):
         for slot in SLOT_IDS:
             self.refresh_button(slot)
+        self.hud.refresh()
         self.stop_btn.config(text=f"{key_name(*self.s.stop_key())}  STOP")
 
     def select(self, slot):
@@ -458,12 +489,14 @@ class MainWindow:
         kind = event[0]
         if kind == "flash":
             slot = event[1]
+            self.hud.flash(slot)
             b = self.buttons[slot]
             b.config(bg=WHITE, fg=BG)
             self.root.after(120, lambda: b.config(bg=KEY_HI if slot == self.selected else KEY,
                                                   fg=WHITE if slot in self.s.cache else MUTED))
         elif kind == "refresh":
             self.refresh_button(event[1])
+            self.hud.refresh()
             if event[1] == self.selected:
                 self.draw_wave()
             self.set_status(None)
@@ -503,6 +536,7 @@ class MainWindow:
     def quit(self):
         log.info("quit")
         self._alive = False
+        self.hud.destroy()
         self.s.shutdown()
         if self.tray:
             self.tray.stop()

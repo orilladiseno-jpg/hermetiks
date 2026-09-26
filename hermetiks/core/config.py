@@ -5,7 +5,7 @@ import os
 from .effects import DEFAULT_FX
 from .slots import DEFAULT_STOP
 
-SCHEMA_VERSION = 2
+SCHEMA_VERSION = 3
 
 
 def data_dir():
@@ -21,8 +21,8 @@ def default_path():
 
 
 DEFAULTS = dict(version=SCHEMA_VERSION, language="en", device="", monitor="", master=100, suppress=False,
-                active=True, close_tray=False, startup=False, duck=False, duck_level=25,
-                duck_apps="spotify.exe", nowplaying=False, nowplaying_port=8765,
+                active=True, close_tray=False, startup=False, hud=True, duck=True, duck_level=30,
+                duck_apps="spotify.exe", nowplaying=True, nowplaying_port=8765,
                 stop_key=list(DEFAULT_STOP), profile="Main", profiles={})
 
 
@@ -34,11 +34,18 @@ class Config:
     # -- persistence ---------------------------------------------------------------------
     def _load(self):
         data = json.loads(json.dumps(DEFAULTS))
+        saved_version = SCHEMA_VERSION
         try:
             with open(self.path, encoding="utf-8") as f:
-                data.update(json.load(f))
+                saved = json.load(f)
+            saved_version = saved.get("version", 1)
+            data.update(saved)
         except (OSError, ValueError):
             pass
+        if saved_version < 3:  # ducking was off and hidden before: turn on the new smooth duck once
+            data["duck"], data["hud"], data["nowplaying"] = True, True, True
+            if data.get("duck_level") == 25:
+                data["duck_level"] = 30
         return self._migrate(data)
 
     @staticmethod

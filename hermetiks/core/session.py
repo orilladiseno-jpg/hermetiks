@@ -12,8 +12,9 @@ import uuid
 
 from . import audio, effects, importer, mixer
 from .config import Config, sounds_dir
+from . import log
 from .ducking import Ducker
-from .hotkeys import Hook
+from .hotkeys import Hook, RawInput
 from .nowplaying import NowPlaying
 from .slots import DEFAULT_KEYS, ESCAPE_KEY, NO_KEY, SLOT_IDS
 
@@ -28,6 +29,7 @@ class Session:
         self.keymap = {}
         self.capture = None
         self.hook = None
+        self.raw = None
         self.ducker = None
         self.nowplaying = None
         os.makedirs(sounds_dir(), exist_ok=True)
@@ -36,8 +38,15 @@ class Session:
     def start(self):
         self.rebuild_keymap()
         self.load_profile()
-        self.hook = Hook(self.on_key)
-        self.hook.start()
+        self.raw = RawInput(self.handle_key)
+        self.raw.start()
+        self.raw.ready.wait(3)
+        if not self.raw.ok:  # very unlikely: fall back to a hook that both detects and swallows
+            log.info("raw input unavailable, using the keyboard hook")
+            self.hook = Hook(self.on_key)
+            self.hook.start()
+        else:
+            self.set_suppress(self.cfg["suppress"])
         self.ducker = Ducker(lambda: self.cfg.data, lambda: any(o.busy for o in self.outs))
         self.ducker.start()
         if self.cfg["nowplaying"]:
@@ -48,6 +57,8 @@ class Session:
 
     def shutdown(self):
         self.set_nowplaying(False)
+        if self.raw:
+            self.raw.stop()
         if self.hook:
             self.hook.stop()
         if self.ducker:
@@ -103,34 +114,55 @@ class Session:
         self.rebuild_keymap()
         self.cfg.save()
 
-    def on_key(self, key, down):
-        """Hook-thread callback. Returns True to swallow the key."""
+    def handle_key(self, key, down):
+        """Every physical key event (Raw Input thread): capture, stop key and slot triggers."""
         if self.capture is not None:
             if down:
                 target, self.capture = self.capture, None
                 self.events.put(("captured", target, key))
-            return True
+            return
         if not self.cfg["active"]:
-            return False
-        swallow = self.cfg["suppress"]
+            return
         if key == self.stop_key():
             if down and key not in self.pressed:
                 self.pressed.add(key)
                 self.stop_all()
             elif not down:
                 self.pressed.discard(key)
-            return swallow
+            return
         slot = self.keymap.get(key)
         if slot is None:
-            return False
+            return
         if down:
             if key in self.pressed:  # auto-repeat
-                return swallow
+                return
             self.pressed.add(key)
         else:
             self.pressed.discard(key)
         self.trigger(slot, down)
+
+    def swallow(self, key, down):
+        """Keyboard-hook decision: should the game / focused app NOT see this key?"""
+        if self.capture is not None:
+            return True
+        return bool(self.cfg["active"] and self.cfg["suppress"] and (key == self.stop_key() or key in self.keymap))
+
+    def on_key(self, key, down):
+        """handle_key + swallow in one call (used when the hook is the only input source)."""
+        swallow = self.swallow(key, down)
+        self.handle_key(key, down)
         return swallow
+
+    def set_suppress(self, enabled):
+        """The low-level hook is installed only while "block keys" is on, so it can never slow the keyboard otherwise."""
+        if not (self.raw and self.raw.ok):
+            return
+        if enabled and self.hook is None:
+            self.hook = Hook(self.swallow)
+            self.hook.start()
+        elif not enabled and self.hook is not None:
+            self.hook.stop()
+            self.hook = None
 
     # -- playback ----------------------------------------------------------------------------
     def trigger(self, slot, down=True):

@@ -10,7 +10,8 @@ import os
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SRC = os.path.join(ROOT, "hermetiks", "resources", "overlay")
 FONTS = os.path.join(ROOT, "hermetiks", "resources", "fonts")
-OUT = os.path.join(ROOT, "site", "downloads", "hermetiks-nowplaying.html")
+OUTS = [os.path.join(ROOT, "site", "downloads", "hermetiks-nowplaying.html"),
+        os.path.join(SRC, "hermetiks-nowplaying.html")]  # second copy ships inside the app ("Save HTML for OBS")
 
 
 def read(*parts, mode="r"):
@@ -34,10 +35,11 @@ def main():
     html = ("<!doctype html>\n<html lang=\"en\">\n<head>\n<meta charset=\"utf-8\">\n<title>HERMETIKS Now Playing</title>\n"
             "<!-- HERMETIKS Now Playing for OBS. Requires the HERMETIKS app (1.1 or newer) running with 'Now Playing overlay' ticked. -->\n"
             f"<style>\n{css}</style>\n</head>\n{body}<script>\n{js}</script>\n</body>\n</html>\n")
-    os.makedirs(os.path.dirname(OUT), exist_ok=True)
-    with open(OUT, "w", encoding="utf-8", newline="\n") as f:
-        f.write(html)
-    print(f"wrote {OUT} ({len(html) // 1024} KB)")
+    for out in OUTS:
+        os.makedirs(os.path.dirname(out), exist_ok=True)
+        with open(out, "w", encoding="utf-8", newline="\n") as f:
+            f.write(html)
+        print(f"wrote {out} ({len(html) // 1024} KB)")
 
 
 if __name__ == "__main__":

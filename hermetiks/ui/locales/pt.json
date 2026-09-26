@@ -81,5 +81,10 @@
   "np.copy": "Copiar URL",
   "np.copied": "Copiado",
   "np.hint": "No OBS adicione uma fonte Navegador com esta URL, tamanho 640 x 240. Adicione ?layout=stack para um cartão vertical.",
-  "np.error": "Não foi possível iniciar o overlay Now Playing: {detail}"
+  "np.error": "Não foi possível iniciar o overlay Now Playing: {detail}",
+  "opt.hud": "Mini overlay (canto superior direito)",
+  "np.save": "Salvar HTML para o OBS...",
+  "np.preview": "Pré-visualizar",
+  "np.saved": "Salvo. No OBS: fonte Navegador, marque Arquivo local e escolha {path}",
+  "np.dialog": "Salvar o arquivo para o OBS"
 }

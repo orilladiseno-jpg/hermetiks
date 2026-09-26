@@ -139,3 +139,25 @@ def test_profiles_keep_separate_key_maps(session):
     assert session.slot_key(97) == DEFAULT_KEYS[97]
     session.switch_profile("Main")
     assert session.slot_key(97) == (0x1E, 0)
+
+
+def test_hook_only_swallows_configured_keys_and_never_triggers(session):
+    session.cfg["suppress"] = True
+    assert session.swallow(DEFAULT_KEYS[97], True) is True
+    assert session.swallow(DEFAULT_STOP, True) is True
+    assert session.swallow((0x1E, 0), True) is False
+    assert not session.outs[0].busy  # deciding to swallow must not play anything
+    session.cfg["suppress"] = False
+    assert session.swallow(DEFAULT_KEYS[97], True) is False
+
+
+def test_raw_input_path_triggers_without_the_hook(session):
+    session.handle_key(DEFAULT_KEYS[97], True)
+    assert session.outs[0].playing(97)
+    session.handle_key(DEFAULT_STOP, True)
+    assert not session.outs[0].busy
+
+
+def test_set_suppress_is_a_noop_without_raw_input(session):
+    session.set_suppress(True)
+    assert session.hook is None

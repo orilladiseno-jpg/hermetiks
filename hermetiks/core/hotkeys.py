@@ -1,7 +1,11 @@
-"""Global keyboard hook (WH_KEYBOARD_LL) matching physical keys by scancode.
+"""Global keyboard input, matching physical keys by scancode.
+
+* RawInput  detects the keys (WM_INPUT with RIDEV_INPUTSINK). It keeps working while the window is minimized, in the
+            tray or behind a game, and Windows never drops it for being slow (unlike a low-level hook).
+* Hook      (WH_KEYBOARD_LL) is only installed while "block keys for the game" is on, purely to swallow keys.
 
 Scancodes make the numpad work regardless of NumLock, and let any key be assigned.
-The hook only compares each key with the configured shortcuts; keystrokes are never stored or sent anywhere.
+Keys are only compared with the configured shortcuts; keystrokes are never stored or sent anywhere.
 """
 import ctypes
 import threading
@@ -74,6 +78,100 @@ class Hook(threading.Thread):
             user32.TranslateMessage(ctypes.byref(msg))
             user32.DispatchMessageW(ctypes.byref(msg))
         user32.UnhookWindowsHookEx(handle)
+
+    def stop(self):
+        if self._thread_id:
+            user32.PostThreadMessageW(self._thread_id, WM_QUIT, 0, 0)
+
+
+# ---- Raw Input ----------------------------------------------------------------------------------------------
+WM_INPUT, RIM_TYPEKEYBOARD, RID_INPUT = 0x00FF, 1, 0x10000003
+RIDEV_INPUTSINK, RI_KEY_BREAK, RI_KEY_E0 = 0x00000100, 0x01, 0x02
+HWND_MESSAGE = ctypes.c_void_p(-3)
+LRESULT = ctypes.c_ssize_t
+WNDPROC = ctypes.WINFUNCTYPE(LRESULT, wintypes.HWND, wintypes.UINT, wintypes.WPARAM, wintypes.LPARAM)
+
+
+class WNDCLASSW(ctypes.Structure):
+    _fields_ = [("style", wintypes.UINT), ("lpfnWndProc", WNDPROC), ("cbClsExtra", ctypes.c_int), ("cbWndExtra", ctypes.c_int),
+                ("hInstance", wintypes.HINSTANCE), ("hIcon", wintypes.HANDLE), ("hCursor", wintypes.HANDLE),
+                ("hbrBackground", wintypes.HANDLE), ("lpszMenuName", wintypes.LPCWSTR), ("lpszClassName", wintypes.LPCWSTR)]
+
+
+class RAWINPUTDEVICE(ctypes.Structure):
+    _fields_ = [("usUsagePage", wintypes.USHORT), ("usUsage", wintypes.USHORT), ("dwFlags", wintypes.DWORD),
+                ("hwndTarget", wintypes.HWND)]
+
+
+class RAWINPUTHEADER(ctypes.Structure):
+    _fields_ = [("dwType", wintypes.DWORD), ("dwSize", wintypes.DWORD), ("hDevice", wintypes.HANDLE), ("wParam", wintypes.WPARAM)]
+
+
+class RAWKEYBOARD(ctypes.Structure):
+    _fields_ = [("MakeCode", wintypes.USHORT), ("Flags", wintypes.USHORT), ("Reserved", wintypes.USHORT),
+                ("VKey", wintypes.USHORT), ("Message", wintypes.UINT), ("ExtraInformation", wintypes.ULONG)]
+
+
+class RAWINPUT(ctypes.Structure):
+    _fields_ = [("header", RAWINPUTHEADER), ("keyboard", RAWKEYBOARD), ("pad", ctypes.c_ubyte * 32)]
+
+
+user32.DefWindowProcW.argtypes = [wintypes.HWND, wintypes.UINT, wintypes.WPARAM, wintypes.LPARAM]
+user32.DefWindowProcW.restype = LRESULT
+user32.RegisterClassW.argtypes = [ctypes.POINTER(WNDCLASSW)]
+user32.CreateWindowExW.argtypes = [wintypes.DWORD, wintypes.LPCWSTR, wintypes.LPCWSTR, wintypes.DWORD, ctypes.c_int, ctypes.c_int,
+                                   ctypes.c_int, ctypes.c_int, wintypes.HWND, wintypes.HMENU, wintypes.HINSTANCE, wintypes.LPVOID]
+user32.CreateWindowExW.restype = wintypes.HWND
+user32.RegisterRawInputDevices.argtypes = [ctypes.POINTER(RAWINPUTDEVICE), wintypes.UINT, wintypes.UINT]
+user32.GetRawInputData.argtypes = [wintypes.HANDLE, wintypes.UINT, wintypes.LPVOID, ctypes.POINTER(wintypes.UINT), wintypes.UINT]
+
+
+class RawInput(threading.Thread):
+    """handler(key, down) for every physical key press/release, from a hidden message-only window."""
+
+    def __init__(self, handler):
+        super().__init__(daemon=True, name="hermetiks-rawinput")
+        self.handler = handler
+        self.ready = threading.Event()
+        self.ok = False
+        self._thread_id = None
+        self._wndproc = WNDPROC(self._proc)
+
+    def _proc(self, hwnd, msg, wparam, lparam):
+        if msg == WM_INPUT:
+            try:
+                self._read(lparam)
+            except Exception:  # noqa: BLE001
+                pass
+        return user32.DefWindowProcW(hwnd, msg, wparam, lparam)
+
+    def _read(self, handle):
+        raw = RAWINPUT()
+        size = wintypes.UINT(ctypes.sizeof(raw))
+        got = user32.GetRawInputData(handle, RID_INPUT, ctypes.byref(raw), ctypes.byref(size), ctypes.sizeof(RAWINPUTHEADER))
+        if got == 0xFFFFFFFF or raw.header.dwType != RIM_TYPEKEYBOARD:
+            return
+        kb = raw.keyboard
+        if kb.MakeCode in (0, 0xFF):  # fake keys Windows injects around NumLock / Shift
+            return
+        self.handler((kb.MakeCode, 1 if kb.Flags & RI_KEY_E0 else 0), not (kb.Flags & RI_KEY_BREAK))
+
+    def run(self):
+        self._thread_id = kernel32.GetCurrentThreadId()
+        instance = kernel32.GetModuleHandleW(None)
+        cls = WNDCLASSW()
+        cls.lpfnWndProc, cls.hInstance, cls.lpszClassName = self._wndproc, instance, "HermetiksRawInput"
+        user32.RegisterClassW(ctypes.byref(cls))
+        hwnd = user32.CreateWindowExW(0, "HermetiksRawInput", "HermetiksRawInput", 0, 0, 0, 0, 0, HWND_MESSAGE, None, instance, None)
+        dev = RAWINPUTDEVICE(1, 6, RIDEV_INPUTSINK, hwnd)  # generic desktop / keyboard, also when not focused
+        self.ok = bool(hwnd) and bool(user32.RegisterRawInputDevices(ctypes.byref(dev), 1, ctypes.sizeof(dev)))
+        self.ready.set()
+        if not self.ok:
+            return
+        msg = wintypes.MSG()
+        while user32.GetMessageW(ctypes.byref(msg), None, 0, 0) > 0:
+            user32.TranslateMessage(ctypes.byref(msg))
+            user32.DispatchMessageW(ctypes.byref(msg))
 
     def stop(self):
         if self._thread_id:

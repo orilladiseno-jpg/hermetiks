@@ -24,7 +24,7 @@
 
   <h2>The application</h2>
   <ul>
-    <li><b>Keyboard hook.</b> To react to your shortcuts while a game has focus, the app installs a Windows low-level keyboard hook. Each key press is only compared with your configured shortcuts and discarded. Keystrokes are never stored, logged or transmitted.</li>
+    <li><b>Keyboard hook.</b> To react to your shortcuts while a game has focus, the app reads keyboard events through Windows Raw Input (and, only if you enable "Block keys for the game", a low-level keyboard hook). Each key press is only compared with your configured shortcuts and discarded. Keystrokes are never stored, logged or transmitted.</li>
     <li><b>Network access.</b> The app connects to the internet only when you import audio from a link (a direct audio URL, or a page supported by yt-dlp such as YouTube). Nothing else is sent anywhere.</li>
     <li><b>Other applications' volume.</b> If you enable Duck, the app temporarily lowers the volume of the applications you list (default: Spotify) through the Windows audio session API and restores it afterwards.</li>
     <li><b>Now Playing overlay.</b> The overlay built into the app reads what is playing from the Windows media controls and serves it only to your own computer (127.0.0.1); nothing leaves your machine.</li>

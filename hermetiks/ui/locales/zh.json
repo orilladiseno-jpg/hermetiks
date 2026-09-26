@@ -81,5 +81,10 @@
   "np.copy": "复制链接",
   "np.copied": "已复制",
   "np.hint": "在 OBS 中添加“浏览器”来源并填入此链接，大小 640 x 240。加 ?layout=stack 可显示为竖版卡片。",
-  "np.error": "无法启动“正在播放”浮层：{detail}"
+  "np.error": "无法启动“正在播放”浮层：{detail}",
+  "opt.hud": "迷你浮层（右上角）",
+  "np.save": "保存 OBS 用 HTML...",
+  "np.preview": "预览",
+  "np.saved": "已保存。在 OBS 中：浏览器来源，勾选“本地文件”，选择 {path}",
+  "np.dialog": "保存 OBS 文件"
 }

@@ -81,5 +81,10 @@
   "np.copy": "Copy URL",
   "np.copied": "Copied",
   "np.hint": "In OBS add a Browser source with this URL, size 640 x 240. Add ?layout=stack for a vertical card.",
-  "np.error": "Could not start the Now Playing overlay: {detail}"
+  "np.error": "Could not start the Now Playing overlay: {detail}",
+  "opt.hud": "Mini overlay (top right)",
+  "np.save": "Save HTML for OBS...",
+  "np.preview": "Preview",
+  "np.saved": "Saved. In OBS: Browser source, tick Local file, choose {path}",
+  "np.dialog": "Save the OBS file"
 }

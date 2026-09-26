@@ -17,9 +17,11 @@ hermetiks/ui            FRONTEND (tkinter)                hermetiks/core        
 - **Session** is the only object the UI talks to. It owns the outputs, the decoded clips, the key map, the
   hook and the ducker. It never imports tkinter; the UI is notified through `Session.events`
   (`flash`, `refresh`, `status`, `imported`, `captured`).
-- **Hook** runs a `WH_KEYBOARD_LL` hook on its own thread and identifies keys by `(scancode, extended)`,
-  which makes the numpad independent of NumLock and lets any key be assigned. The handler must return
-  quickly; playback only appends a voice to the mixer.
+- **RawInput** (hidden message-only window, `RIDEV_INPUTSINK`) detects keys by `(scancode, extended)`, which makes the numpad
+  independent of NumLock and lets any key be assigned. It works minimized / in the tray and is never dropped by Windows.
+  **Hook** (`WH_KEYBOARD_LL`) is installed only while "block keys" is on and only decides which keys to swallow.
+- **Ducker** fades other apps' session volume with a smoothstep ramp (`DuckRamp`, pure and unit-tested) across every output device.
+- **hud.py** is the click-through top-right mini overlay.
 - **Out / mixer**: one PortAudio stream per output (main and optional monitor). The audio callback mixes
   all active voices; clips are pre-rendered, so effects cost nothing at play time.
 - **effects.render()** applies the chain: trim, speed, reverse, EQ, robot, radio, echo, reverb, normalize, volume.
