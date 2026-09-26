@@ -1,0 +1,33 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "hermetiks"
+dynamic = ["version"]
+description = "Open source numpad soundboard for Windows"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.10"
+authors = [{ name = "Orilla Estudio Creativo - HERMETIKS COLLECTIVE" }]
+dependencies = [
+    "numpy", "sounddevice", "soundfile", "pillow", "pystray", "pycaw", "comtypes", "av", "yt-dlp",
+]
+
+[project.optional-dependencies]
+dev = ["pytest", "pyinstaller", "fonttools"]
+
+[project.gui-scripts]
+hermetiks = "hermetiks.ui:run"
+
+[tool.setuptools.dynamic]
+version = { attr = "hermetiks.__version__" }
+
+[tool.setuptools.packages.find]
+include = ["hermetiks*"]
+
+[tool.setuptools.package-data]
+hermetiks = ["resources/**/*", "ui/locales/*.json"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

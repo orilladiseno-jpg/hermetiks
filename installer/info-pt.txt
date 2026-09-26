@@ -1,0 +1,23 @@
+﻿HERMETIKS Soundboard
+Criado e desenvolvido pela Orilla Estudio Creativo, parte do HERMETIKS COLLECTIVE, Chile.
+
+É software livre e de código aberto, distribuído sob a Licença MIT (exibida na próxima página; o texto legal original está em inglês).
+
+O que faz
+  - Reproduz os seus sons ao pressionar teclas, mesmo com um jogo em primeiro plano.
+  - Envia o áudio para o dispositivo de saída que você escolher, misturando-se com o Spotify ou o Chrome.
+
+Permissões e privacidade
+  - Instala-se apenas para o usuário atual e não precisa de direitos de administrador.
+  - Usa um hook de teclado do Windows para detectar os seus atalhos. As teclas são apenas comparadas com os seus atalhos; nunca são armazenadas nem enviadas a lugar nenhum.
+  - Não coleta dados, não tem telemetria nem exibe anúncios.
+  - O único acesso à internet ocorre quando você importa áudio de um link.
+  - Pode baixar o volume de outros apps (por exemplo o Spotify) enquanto um clipe toca. Isso pode ser desativado.
+
+Seu conteúdo
+  Você é responsável pelo áudio que importa e por respeitar os direitos autorais e os termos dos sites de onde baixa.
+
+O software é fornecido "como está", sem garantia de qualquer tipo.
+Os componentes de terceiros e suas licenças estão em THIRD_PARTY_NOTICES.txt, instalado com o app.
+
+https://hermetiks.orilladiseno.cl

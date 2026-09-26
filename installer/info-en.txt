@@ -1,0 +1,23 @@
+﻿HERMETIKS Soundboard
+Created and developed by Orilla Estudio Creativo, part of HERMETIKS COLLECTIVE, Chile.
+
+This is free and open source software released under the MIT License (shown on the next page).
+
+What it does
+  - Plays your sounds when you press keys, even while a game is in focus.
+  - Sends the audio to the output device you choose, so it mixes with Spotify or Chrome.
+
+Permissions and privacy
+  - It installs for the current user only and does not need administrator rights.
+  - It uses a Windows keyboard hook to detect your shortcuts. Keystrokes are only compared with your shortcuts; they are never stored or sent anywhere.
+  - It collects no data, has no telemetry and shows no ads.
+  - The only network access happens when you import audio from a link.
+  - It can lower the volume of other apps (for example Spotify) while a clip plays. This can be turned off.
+
+Your content
+  You are responsible for the audio you import and for respecting copyright and the terms of the sites you download from.
+
+The software is provided "as is", without warranty of any kind.
+Third-party components and their licenses are listed in THIRD_PARTY_NOTICES.txt, installed with the app.
+
+https://hermetiks.orilladiseno.cl
