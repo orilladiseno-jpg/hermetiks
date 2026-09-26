@@ -11,6 +11,8 @@
 - **Now Playing overlay for OBS**: song, artist and cover art from Spotify desktop (or any player with Windows media controls) with
   a subtle HERMETIKS mark. No login. "Save HTML for OBS" in the app writes a single file to use as an OBS local file.
   A web version using the Spotify Web API lives at /spotify/ on the website.
+- Audio output self-heals: if the device is unplugged, busy at start or after sleep, the next key press reopens it.
+- Window fits 1080p screens (scrolls on shorter ones) and remembers a single running copy.
 - Local diagnostic log (`%APPDATA%\Hermetiks\hermetiks.log`, never contains keystrokes or audio).
 - Landing: downloads section, VirusTotal badge, demo with original MP3 clips.
 

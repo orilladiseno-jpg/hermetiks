@@ -161,3 +161,22 @@ def test_raw_input_path_triggers_without_the_hook(session):
 def test_set_suppress_is_a_noop_without_raw_input(session):
     session.set_suppress(True)
     assert session.hook is None
+
+
+def test_dead_output_is_reopened_on_the_next_key_press(session, monkeypatch):
+    class Dead(FakeOut):
+        class stream:  # noqa: N801
+            active = False
+    session.outs = [Dead()]
+    reopened = []
+
+    def fake_rebuild():
+        session.outs = [FakeOut()]
+        reopened.append(1)
+        return ["Speakers"], []
+    monkeypatch.setattr(session, "rebuild_outputs", fake_rebuild)
+    session.trigger(97, True)
+    assert reopened == [1] and session.outs[0].playing(97)
+    session.outs[0].stream = type("S", (), {"active": False})()
+    session.trigger(97, True)
+    assert reopened == [1]  # throttled: not more than once every 2 seconds

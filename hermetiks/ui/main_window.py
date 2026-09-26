@@ -29,7 +29,7 @@ SLIDERS = [("vol", 0, 200, 0), ("speed", 50, 200, 0), ("trim_in", 0, 95, 0), ("t
            ("bass", -12, 12, 1), ("treble", -12, 12, 1), ("echo", 0, 100, 1), ("reverb", 0, 100, 1)]
 CHECKS = ("radio", "robot", "reverse", "normalize")
 WAVE_W, WAVE_H = 560, 84
-LOGO_WIDTH = 340
+LOGO_WIDTH = 270
 
 
 class MainWindow:
@@ -73,24 +73,47 @@ class MainWindow:
         theme.style_ttk(r)
         self.buttons, self.vars = {}, {}
 
+        self._make_page()
         self._build_header()
         self._build_profile_bar()
-        body = tk.Frame(r, bg=BG)
-        body.pack(padx=28, pady=8)
+        body = tk.Frame(self.page, bg=BG)
+        body.pack(padx=28, pady=6)
         self._build_pad(body)
         self._build_editor(body)
         self._build_footer()
         self.refresh_all_buttons()
+        self._fit_window()
+
+    def _make_page(self):
+        """A canvas that holds the whole UI, so short screens (laptops) can scroll instead of cutting the window."""
+        self.canvas = tk.Canvas(self.root, bg=BG, highlightthickness=0, bd=0)
+        self.canvas.pack(fill="both", expand=True)
+        self.page = tk.Frame(self.canvas, bg=BG)
+        self._page_id = self.canvas.create_window((0, 0), window=self.page, anchor="nw")
+        self.page.bind("<Configure>", lambda e: self.canvas.configure(scrollregion=self.canvas.bbox("all")))
+        self.root.bind_all("<MouseWheel>", self._wheel)
+
+    def _wheel(self, event):
+        first, last = self.canvas.yview()
+        if first > 0 or last < 1:
+            self.canvas.yview_scroll(int(-event.delta / 120) * 2, "units")
+
+    def _fit_window(self):
+        self.root.update_idletasks()
+        w, h = self.page.winfo_reqwidth(), self.page.winfo_reqheight()
+        avail = self.root.winfo_screenheight() - 110  # title bar + taskbar
+        self.canvas.configure(width=w, height=min(h, avail))
+        self.root.resizable(False, h > avail)
 
     def _build_header(self):
-        head = tk.Frame(self.root, bg=BG)
-        head.pack(pady=(22, 10))
+        head = tk.Frame(self.page, bg=BG)
+        head.pack(pady=(14, 4))
         img = Image.open(resource("lockup-white.png"))
         img = img.resize((LOGO_WIDTH, int(img.height * LOGO_WIDTH / img.width)), Image.LANCZOS)
         self._logo = ImageTk.PhotoImage(img)
         tk.Label(head, image=self._logo, bg=BG).pack()
 
-        top = tk.Frame(self.root, bg=BG)
+        top = tk.Frame(self.page, bg=BG)
         top.place(relx=1.0, x=-28, y=20, anchor="ne")
         self.lang_var = tk.StringVar(value=LANGUAGES[language()])
         lang = ttk.Combobox(top, textvariable=self.lang_var, values=list(LANGUAGES.values()), state="readonly", width=10)
@@ -99,8 +122,8 @@ class MainWindow:
         button(top, t("about.button"), lambda: About(self.root)).pack(side="left", padx=(8, 0))
 
     def _build_profile_bar(self):
-        bar = tk.Frame(self.root, bg=BG)
-        bar.pack(fill="x", padx=28, pady=(6, 4))
+        bar = tk.Frame(self.page, bg=BG)
+        bar.pack(fill="x", padx=28, pady=(4, 2))
         tk.Label(bar, text=t("profile.label"), bg=BG, fg=MUTED, font=font(9)).pack(side="left")
         self.profile_var = tk.StringVar(value=self.cfg.profile)
         self.profile_box = ttk.Combobox(bar, textvariable=self.profile_var, state="readonly", width=22,
@@ -118,7 +141,7 @@ class MainWindow:
         pad.grid(row=0, column=0, sticky="n", padx=(0, 26))
         for slot, label in SLOTS:
             row, col = LAYOUT[slot]
-            b = tk.Button(pad, text=label, width=9, height=4, relief="flat", bd=0, bg=KEY, fg=TEXT,
+            b = tk.Button(pad, text=label, width=9, height=3, relief="flat", bd=0, bg=KEY, fg=TEXT,
                           activebackground=KEY_HI, activeforeground=WHITE, font=font(9),
                           command=lambda s=slot: self.select(s))
             b.grid(row=row, column=col, columnspan=2 if slot == 96 else 1, rowspan=2 if slot == 107 else 1,
@@ -128,10 +151,10 @@ class MainWindow:
         self.stop_btn = tk.Button(pad, relief="flat", bd=0, bg=WHITE, fg=BG, activebackground=TEXT,
                                   font=font(9, True), command=self.s.stop_all)
         self.stop_btn.grid(row=4, column=2, columnspan=2, sticky="nsew", padx=3, pady=3)
-        tk.Label(pad, text=t("pad.hint"), bg=BG, fg=MUTED, font=font(8)).grid(
-            row=5, column=0, columnspan=4, sticky="w", pady=(10, 0))
+        tk.Label(pad, text=t("pad.hint"), bg=BG, fg=MUTED, font=font(8), justify="left").grid(
+            row=5, column=0, columnspan=2, sticky="w", pady=(8, 0))
         button(pad, t("pad.change_stop"), lambda: self.begin_capture("stop")).grid(
-            row=6, column=0, columnspan=4, sticky="w", pady=(6, 0))
+            row=5, column=2, columnspan=2, sticky="e", pady=(6, 0))
 
     def _build_editor(self, body):
         ed = tk.Frame(body, bg=PANEL, padx=20, pady=16)
@@ -188,8 +211,8 @@ class MainWindow:
             checkbox(checks, t(f"fx.{key}"), var, self.editor_changed, PANEL).pack(side="left", padx=(0, 16))
 
     def _build_footer(self):
-        foot = tk.Frame(self.root, bg=BG)
-        foot.pack(fill="x", padx=28, pady=(8, 18))
+        foot = tk.Frame(self.page, bg=BG)
+        foot.pack(fill="x", padx=28, pady=(6, 14))
         names = [name for name, _, _ in mixer.output_devices()]
         default, none = t("output.default"), t("output.none")
         self.device_var = tk.StringVar(value=self.cfg["device"] or default)
@@ -232,7 +255,7 @@ class MainWindow:
         checkbox(opts, t("opt.hud"), self.hud_var, self.options_changed).pack(side="left")
         self._build_nowplaying(foot)
         self.status_lbl = tk.Label(foot, text="", bg=BG, fg=MUTED, font=font(8), anchor="w")
-        self.status_lbl.grid(row=6, column=0, columnspan=3, sticky="w", pady=(8, 0))
+        self.status_lbl.grid(row=7, column=0, columnspan=3, sticky="w", pady=(6, 0))
         self.set_status(*(self._status or (None, {})))
 
     def _build_nowplaying(self, foot):
@@ -248,7 +271,7 @@ class MainWindow:
         self.np_view = button(box, t("np.preview"), lambda: webbrowser.open(self.np_url.get() + "?demo=1"))
         self._show_nowplaying_controls(bool(self.s.nowplaying))
         tk.Label(foot, text=t("np.hint"), bg=BG, fg=MUTED, font=font(8), anchor="w").grid(
-            row=5, column=0, columnspan=3, sticky="w", pady=(48, 0))
+            row=6, column=0, columnspan=3, sticky="w", pady=(4, 0))
 
     def toggle_nowplaying(self):
         try:
@@ -268,6 +291,7 @@ class MainWindow:
         self.np_var.set(bool(url))
         self.np_url.set(url)
         self._show_nowplaying_controls(bool(url))
+        self._fit_window()
 
     def _show_nowplaying_controls(self, on):
         for w in (self.np_entry, self.np_copy, self.np_save, self.np_view):
@@ -277,6 +301,8 @@ class MainWindow:
             self.np_copy.pack(side="left", padx=(0, 6))
             self.np_save.pack(side="left", padx=(0, 6))
             self.np_view.pack(side="left")
+        if hasattr(self, "canvas"):
+            self._fit_window()
 
     def save_nowplaying_html(self):
         path = filedialog.asksaveasfilename(title=t("np.dialog"), defaultextension=".html", initialfile="hermetiks-nowplaying.html",

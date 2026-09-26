@@ -8,6 +8,7 @@ import os
 import queue
 import shutil
 import threading
+import time
 import uuid
 
 from . import audio, effects, importer, mixer
@@ -32,6 +33,7 @@ class Session:
         self.raw = None
         self.ducker = None
         self.nowplaying = None
+        self._last_reopen = 0.0
         os.makedirs(sounds_dir(), exist_ok=True)
 
     # -- lifecycle -------------------------------------------------------------------------
@@ -176,6 +178,8 @@ class Session:
         data = self.cache.get(slot)
         if data is None:
             return
+        if not any(getattr(getattr(o, "stream", None), "active", True) for o in outs):
+            outs = self._heal_outputs() or outs
         if mode == "loop" and any(o.playing(slot) for o in outs):
             for o in outs:
                 o.stop_slot(slot)
@@ -183,6 +187,16 @@ class Session:
         for o in outs:
             o.play(data, slot, mode == "loop")
         self.events.put(("flash", slot))
+
+    def _heal_outputs(self):
+        """No live audio stream (device unplugged, resume from sleep, device busy at start): reopen, at most every 2 s."""
+        now = time.monotonic()
+        if now - self._last_reopen < 2.0:
+            return None
+        self._last_reopen = now
+        opened, errors = self.rebuild_outputs()
+        log.info("audio outputs reopened: %s%s", opened, f" errors={errors}" if errors else "")
+        return list(self.outs)
 
     def stop_all(self):
         for o in list(self.outs):
@@ -209,6 +223,8 @@ class Session:
                 except Exception as ex:  # noqa: BLE001
                     errors.append(f"{name}: {ex}")
         self.outs = outs
+        if errors or not opened:
+            log.info("audio outputs: opened=%s errors=%s wanted=%s", opened, errors, wanted)
         return opened, errors
 
     def apply_master(self):
