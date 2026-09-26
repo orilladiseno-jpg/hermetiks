@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://hermetiks.orilladiseno.cl/sitemap.xml

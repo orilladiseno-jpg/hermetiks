@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>HERMETIKS Soundboard: numpad soundboard for Windows</title>
+  <meta name="description" content="Free, open source numpad soundboard for Windows. Trigger radio clips, phrases and effects with global hotkeys while you play.">
+  <meta name="theme-color" content="#0a0a0a">
+  <link rel="canonical" href="https://hermetiks.orilladiseno.cl/">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="HERMETIKS Soundboard">
+  <meta property="og:description" content="Turn your numpad into a soundboard. Free and open source for Windows.">
+  <meta property="og:url" content="https://hermetiks.orilladiseno.cl/">
+  <meta property="og:image" content="https://hermetiks.orilladiseno.cl/assets/img/og.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" href="assets/img/icon-192.png" sizes="192x192">
+  <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+  <link rel="preload" href="assets/fonts/RethinkSans-Regular.ttf" as="font" type="font/ttf" crossorigin>
+  <link rel="preload" href="assets/fonts/BBHBartle-Regular.ttf" as="font" type="font/ttf" crossorigin>
+  <link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="nav" id="top">
+  <a class="brand" href="#top" aria-label="HERMETIKS Soundboard">
+    <img src="assets/img/mark.svg" alt="" width="26" height="34">
+    <span>HERMETIKS</span>
+  </a>
+  <nav class="nav-links" aria-label="Main">
+    <a href="#features" data-i18n="nav.features">Features</a>
+    <a href="#try" data-i18n="nav.try">Try it</a>
+    <a href="#how" data-i18n="nav.how">How it works</a>
+    <a href="#faq" data-i18n="nav.faq">FAQ</a>
+  </nav>
+  <div class="nav-actions">
+    <label class="lang" aria-label="Language">
+      <select id="lang">
+        <option value="en">English</option>
+        <option value="es">Español</option>
+        <option value="zh">中文</option>
+        <option value="pt">Português</option>
+      </select>
+    </label>
+    <a class="btn btn-sm js-download" href="https://github.com/orilladiseno-jpg/hermetiks/releases/latest" data-i18n="nav.download">Download</a>
+  </div>
+</header>
+
+<main id="main">
+  <!-- HERO -->
+  <section class="hero">
+    <div class="arcs" aria-hidden="true">
+      <svg viewBox="0 0 600 600" preserveAspectRatio="xMidYMid slice">
+        <g fill="none" stroke="currentColor" stroke-linecap="butt">
+          <path class="arc a1" d="M 300 130 A 190 190 0 0 1 300 470"/>
+          <path class="arc a2" d="M 300 90 A 240 240 0 0 1 300 510"/>
+          <path class="arc a3" d="M 300 50 A 290 290 0 0 1 300 550"/>
+          <path class="arc a4" d="M 300 10 A 340 340 0 0 1 300 590"/>
+        </g>
+      </svg>
+    </div>
+    <div class="hero-copy">
+      <p class="eyebrow" data-i18n="hero.eyebrow">Open source  ·  Windows 10 / 11</p>
+      <h1 data-i18n="hero.title">Turn your numpad into a soundboard.</h1>
+      <p class="lead" data-i18n="hero.sub">Trigger radio clips, phrases and effects with global hotkeys while you play. Lightweight, private and free.</p>
+      <div class="cta">
+        <a class="btn btn-lg js-download" href="https://github.com/orilladiseno-jpg/hermetiks/releases/latest">
+          <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3 4.6 10.5 3.5v7.2H3zM11.5 3.4 21 2v8.7h-9.5zM3 11.7h7.5v7.2L3 17.8zM11.5 11.7H21V20.4l-9.5-1.3z"/></svg>
+          <span data-i18n="hero.download">Download for Windows</span>
+        </a>
+        <a class="btn btn-ghost btn-lg" href="https://github.com/orilladiseno-jpg/hermetiks" rel="noopener">
+          <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="m8 7-5 5 5 5M16 7l5 5-5 5M13.5 5l-3 14"/></svg>
+          <span data-i18n="hero.github">View on GitHub</span>
+        </a>
+      </div>
+      <p class="small"><span id="ver">v1.0.0</span>  ·  <span data-i18n="hero.installer">Installer  ·  portable ZIP also available</span></p>
+      <ul class="ticks">
+        <li data-i18n="hero.m1">Free and open source (MIT)</li>
+        <li data-i18n="hero.m2">No telemetry, no ads</li>
+        <li data-i18n="hero.m3">Works with Spotify, Chrome and VB-CABLE</li>
+      </ul>
+    </div>
+    <div class="hero-shot">
+      <div class="window">
+        <div class="window-bar" aria-hidden="true"><i></i><i></i><i></i></div>
+        <video class="shot-video" autoplay muted loop playsinline poster="assets/img/app.png" hidden>
+          <source src="assets/video/hero.mp4" type="video/mp4">
+        </video>
+        <img class="shot-img" src="assets/img/app.png" alt="HERMETIKS Soundboard window with a numpad grid, waveform editor and effects" width="1150" height="973">
+      </div>
+    </div>
+  </section>
+
+  <!-- TRY IT -->
+  <section class="section try" id="try">
+    <div class="wrap narrow center">
+      <p class="eyebrow" data-i18n="try.eyebrow">Live demo</p>
+      <h2 data-i18n="try.title">Try it right here.</h2>
+      <p class="lead" data-i18n="try.sub">Press the numpad on your keyboard or click a pad. Every key plays its own sound, just like in the app.</p>
+    </div>
+    <div class="pad-wrap">
+      <div class="pad" id="pad" role="group" aria-label="Demo numpad">
+        <button class="key" data-key="7"><b>7</b><span>Sting</span></button>
+        <button class="key" data-key="8"><b>8</b><span>Outro</span></button>
+        <button class="key" data-key="9"><b>9</b><span>Static</span></button>
+        <button class="key" data-key="4"><b>4</b><span>Headlines</span></button>
+        <button class="key" data-key="5"><b>5</b><span>Applause</span></button>
+        <button class="key" data-key="6"><b>6</b><span>Drop</span></button>
+        <button class="key" data-key="1"><b>1</b><span>Jingle</span></button>
+        <button class="key" data-key="2"><b>2</b><span>Station ID</span></button>
+        <button class="key" data-key="3"><b>3</b><span>Weather</span></button>
+        <button class="key key-wide" data-key="0"><b>0</b><span>Air horn</span></button>
+        <button class="key key-stop" data-key="."><b>.</b><span data-i18n="try.stop">Stop</span></button>
+      </div>
+      <canvas id="scope" width="640" height="90" aria-hidden="true"></canvas>
+      <p class="small center" data-i18n="try.hint">Numpad . (or Esc) stops everything.</p>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section class="section" id="features">
+    <div class="wrap">
+      <p class="eyebrow" data-i18n="features.eyebrow">Features</p>
+      <h2 data-i18n="features.title">Everything a live radio moment needs.</h2>
+      <div class="grid">
+        <article class="card"><svg class="fi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="2.5" y="6" width="19" height="12" rx="2"/><path d="M6 10h.01M10 10h.01M14 10h.01M18 10h.01M7 14h10"/></svg><h3 data-i18n="f1.t">Global hotkeys</h3><p data-i18n="f1.d"></p></article>
+        <article class="card"><svg class="fi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M3 12h9M9 8l4 4-4 4"/><rect x="15" y="4" width="6" height="6" rx="1"/><rect x="15" y="14" width="6" height="6" rx="1"/></svg><h3 data-i18n="f2.t">Plays where you choose</h3><p data-i18n="f2.d"></p></article>
+        <article class="card"><svg class="fi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/><circle cx="9" cy="7" r="2" fill="#0a0a0a"/><circle cx="15" cy="12" r="2" fill="#0a0a0a"/><circle cx="8" cy="17" r="2" fill="#0a0a0a"/></svg><h3 data-i18n="f3.t">Sound design per key</h3><p data-i18n="f3.d"></p></article>
+        <article class="card"><svg class="fi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M4 10v4h4l5 4V6l-5 4zM16.5 9a4 4 0 0 1 0 6M19 6.5a8 8 0 0 1 0 11"/></svg><h3 data-i18n="f4.t">Duck your music</h3><p data-i18n="f4.d"></p></article>
+        <article class="card"><svg class="fi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m12 3 9 4.5-9 4.5-9-4.5zM3 12l9 4.5 9-4.5M3 16.5 12 21l9-4.5"/></svg><h3 data-i18n="f5.t">Profiles</h3><p data-i18n="f5.d"></p></article>
+        <article class="card"><svg class="fi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M12 4v11M8 11l4 4 4-4M5 19h14"/></svg><h3 data-i18n="f6.t">Import anything</h3><p data-i18n="f6.d"></p></article>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW -->
+  <section class="section" id="how">
+    <div class="wrap">
+      <p class="eyebrow" data-i18n="how.eyebrow">How it works</p>
+      <h2 data-i18n="how.title">Ready in three steps.</h2>
+      <ol class="steps">
+        <li><span class="num">01</span><h3 data-i18n="s1.t">Add your sounds</h3><p data-i18n="s1.d"></p></li>
+        <li><span class="num">02</span><h3 data-i18n="s2.t">Choose the output</h3><p data-i18n="s2.d"></p></li>
+        <li><span class="num">03</span><h3 data-i18n="s3.t">Press a key</h3><p data-i18n="s3.d"></p></li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- TRUST -->
+  <section class="section" id="trust">
+    <div class="wrap">
+      <p class="eyebrow" data-i18n="trust.eyebrow">Trust</p>
+      <h2 data-i18n="trust.title">Open, private, verifiable.</h2>
+      <div class="grid three">
+        <article class="card"><h3 data-i18n="t1.t">Open source</h3><p data-i18n="t1.d"></p></article>
+        <article class="card"><h3 data-i18n="t2.t">Private by design</h3><p data-i18n="t2.d"></p></article>
+        <article class="card"><h3 data-i18n="t3.t">Verify your download</h3><p data-i18n="t3.d"></p><code>Get-FileHash .\Hermetiks-Setup.exe</code></article>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="section" id="faq">
+    <div class="wrap narrow">
+      <p class="eyebrow" data-i18n="faq.eyebrow">FAQ</p>
+      <h2 data-i18n="faq.title">Questions.</h2>
+      <details><summary data-i18n="q1"></summary><p data-i18n="a1"></p></details>
+      <details><summary data-i18n="q2"></summary><p data-i18n="a2"></p></details>
+      <details><summary data-i18n="q3"></summary><p data-i18n="a3"></p></details>
+      <details><summary data-i18n="q4"></summary><p data-i18n="a4"></p></details>
+      <details><summary data-i18n="q5"></summary><p data-i18n="a5"></p></details>
+    </div>
+  </section>
+
+  <!-- FINAL CTA -->
+  <section class="final">
+    <div class="wrap center">
+      <h2 data-i18n="cta.title">Your numpad is waiting.</h2>
+      <a class="btn btn-lg js-download" href="https://github.com/orilladiseno-jpg/hermetiks/releases/latest">
+        <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M3 4.6 10.5 3.5v7.2H3zM11.5 3.4 21 2v8.7h-9.5zM3 11.7h7.5v7.2L3 17.8zM11.5 11.7H21V20.4l-9.5-1.3z"/></svg>
+        <span data-i18n="hero.download">Download for Windows</span>
+      </a>
+    </div>
+    <div class="giant" aria-hidden="true">HERMETIKS</div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="wrap foot">
+    <p data-i18n="foot.credit">Created and developed by Orilla Estudio Creativo, part of HERMETIKS COLLECTIVE, Chile.</p>
+    <nav aria-label="Footer">
+      <a href="privacy.html" data-i18n="foot.privacy">Privacy</a>
+      <a href="https://github.com/orilladiseno-jpg/hermetiks/blob/main/LICENSE" rel="noopener" data-i18n="foot.license">License</a>
+      <a href="https://github.com/orilladiseno-jpg/hermetiks" rel="noopener" data-i18n="foot.source">Source code</a>
+      <a href="https://github.com/orilladiseno-jpg/hermetiks/blob/main/TRADEMARKS.md" rel="noopener" data-i18n="foot.trademarks">Trademarks</a>
+    </nav>
+  </div>
+</footer>
+
+<script src="assets/js/i18n.js"></script>
+<script src="assets/js/main.js"></script>
+</body>
+</html>
