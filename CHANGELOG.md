@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.1.1
+- **Duck finds your music app however it is written** (`spotify`, `Spotify.exe`, `/spotify.exe/`, a full path) and the field is now a
+  picker listing the apps that are playing audio. If nothing matches, the app tells you instead of failing silently.
+- **OBS "Local file" works**: OBS serves local files from the origin `http://absolute`, which was rejected; it is allowed now (with a CORS
+  preflight answer). The overlay also shows a visible message if it cannot reach the app. Using the URL as Browser source is still the simplest way.
+- Settings that fail to save are written to the log.
+
 ## 1.1.0
 - **Works in the background, always.** Hotkeys now use Windows Raw Input, so they keep working while HERMETIKS is minimized,
   in the tray or behind a game, and Windows can no longer drop them for being slow. The keyboard hook is installed only while

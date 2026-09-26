@@ -7,6 +7,7 @@ from tkinter import filedialog, messagebox, simpledialog, ttk
 from PIL import Image, ImageTk
 
 from ..core import importer, log, mixer, startup
+from ..core.ducking import running_audio_apps
 import webbrowser
 from ..core.effects import DEFAULT_FX
 from ..core.hotkeys import key_name
@@ -238,8 +239,10 @@ class MainWindow:
         slider(duck, self.duck_level, 0, 100, 90, self.options_changed).pack(side="left")
         tk.Label(duck, text=t("duck.percent_apps"), bg=BG, fg=MUTED, font=font(9)).pack(side="left", padx=(4, 6))
         self.duck_apps = tk.StringVar(value=self.cfg["duck_apps"])
-        tk.Entry(duck, textvariable=self.duck_apps, bg=KEY, fg=WHITE, insertbackground=WHITE, relief="flat",
-                 font=font(9), width=26).pack(side="left", ipady=3)
+        picker = ttk.Combobox(duck, textvariable=self.duck_apps, width=22, values=[self.cfg["duck_apps"]],
+                              postcommand=lambda: picker.config(values=running_audio_apps() or [self.duck_apps.get()]))
+        picker.pack(side="left")
+        picker.bind("<<ComboboxSelected>>", lambda e: self.options_changed())
         self.duck_apps.trace_add("write", lambda *_: self.options_changed())
 
         opts = tk.Frame(foot, bg=BG)

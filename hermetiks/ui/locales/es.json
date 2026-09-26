@@ -42,7 +42,7 @@
   "output.master": "Master",
   "duck.label": "Duck: bajar otras apps mientras suena",
   "duck.to": "a",
-  "duck.percent_apps": "%   apps:",
+  "duck.percent_apps": "%   app de música:",
   "opt.suppress": "Bloquear teclas para el juego",
   "opt.close_tray": "Cerrar a la bandeja",
   "opt.startup": "Iniciar con Windows",
@@ -80,11 +80,12 @@
   "np.label": "Overlay Now Playing para OBS (Spotify de escritorio)",
   "np.copy": "Copiar URL",
   "np.copied": "Copiado",
-  "np.hint": "En OBS agrega una fuente Navegador con esta URL, tamaño 640 x 240. Agrega ?layout=stack para una tarjeta vertical.",
+  "np.hint": "En OBS: Fuentes > + > Navegador, pega esta URL, ancho 640 alto 240. NO marques \"Archivo local\". Agrega ?layout=stack para tarjeta vertical.",
   "np.error": "No se pudo iniciar el overlay Now Playing: {detail}",
   "opt.hud": "Mini overlay (arriba a la derecha)",
   "np.save": "Guardar HTML para OBS...",
   "np.preview": "Vista previa",
-  "np.saved": "Guardado. En OBS: fuente Navegador, marca Archivo local y elige {path}",
-  "np.dialog": "Guardar el archivo para OBS"
+  "np.saved": "Guardado. Lo más simple es usar la URL de arriba en OBS; el archivo también sirve: fuente Navegador, marca Archivo local y elige {path}",
+  "np.dialog": "Guardar el archivo para OBS",
+  "duck.no_match": "Duck: no hay ninguna app de audio llamada \"{apps}\" sonando. Abre la lista junto a \"app de música\" y elige la tuya."
 }

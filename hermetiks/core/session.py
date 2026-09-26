@@ -49,7 +49,8 @@ class Session:
             self.hook.start()
         else:
             self.set_suppress(self.cfg["suppress"])
-        self.ducker = Ducker(lambda: self.cfg.data, lambda: any(o.busy for o in self.outs))
+        self.ducker = Ducker(lambda: self.cfg.data, lambda: any(o.busy for o in self.outs),
+                             lambda apps: self.events.put(("status", "duck.no_match", {"apps": apps})))
         self.ducker.start()
         if self.cfg["nowplaying"]:
             try:

@@ -6,6 +6,7 @@ next start puts them back.
 """
 import json
 import os
+import re
 import threading
 import time
 
@@ -16,6 +17,49 @@ ATTACK = 0.16   # seconds to reach the ducked level
 RELEASE = 0.50  # seconds to come back
 HOLD = 0.25     # keep ducked this long after the last clip so quick consecutive clips don't pump the music
 FRAME = 1 / 60
+
+
+def normalize_apps(text):
+    """"/spotify.exe/", "Spotify.exe", "C:\\Apps\\Spotify.exe", 'spotify' -> ["spotify"]. Tolerant on purpose."""
+    tokens = []
+    for raw in re.split(r"[,;\n]+", text or ""):
+        parts = [p for p in raw.strip().strip("\"' ").replace("\\", "/").split("/") if p.strip()]
+        if not parts:
+            continue
+        token = parts[-1].strip().lower()
+        token = token[:-4] if token.endswith(".exe") else token
+        if token and token not in tokens:
+            tokens.append(token)
+    return tokens
+
+
+def app_matches(process_name, tokens):
+    base = process_name.lower()
+    base = base[:-4] if base.endswith(".exe") else base
+    return any(t == base or (len(t) >= 3 and t in base) for t in tokens)
+
+
+def running_audio_apps():
+    """Names of the apps that currently have an audio session on any output device (for the picker)."""
+    result = []
+
+    def work():
+        try:
+            import comtypes
+            comtypes.CoInitialize()
+            for _, s in iter_sessions():
+                try:
+                    name = s.Process.name() if s.Process else ""
+                except Exception:  # noqa: BLE001
+                    name = ""
+                if name and name not in result and name.lower() not in ("svchost.exe", "audiodg.exe"):
+                    result.append(name)
+        except Exception:  # noqa: BLE001
+            pass
+    t = threading.Thread(target=work, daemon=True)
+    t.start()
+    t.join(3)
+    return sorted(result, key=str.lower)
 
 
 def ease(p):
@@ -77,9 +121,10 @@ def _state_path():
 
 
 class Ducker(threading.Thread):
-    def __init__(self, get_config, is_busy):
+    def __init__(self, get_config, is_busy, on_no_match=None):
         super().__init__(daemon=True, name="hermetiks-ducker")
-        self.get_config, self.is_busy = get_config, is_busy
+        self.get_config, self.is_busy, self.on_no_match = get_config, is_busy, on_no_match
+        self._warned = 0.0
         self.running = True
         self.ramp = DuckRamp()
         self._tracked = {}
@@ -87,10 +132,11 @@ class Ducker(threading.Thread):
         self._logged = None
 
     # -- Windows audio sessions -------------------------------------------------------------
-    def _scan(self, names):
+    def _scan(self, tokens):
+        names = tokens
         for device_id, s in iter_sessions():
             try:
-                if not (s.Process and s.Process.name().lower() in names):
+                if not (s.Process and app_matches(s.Process.name(), tokens)):
                     continue
                 key = f"{device_id}|{getattr(s, 'InstanceIdentifier', None) or s.Process.pid}"
                 if key not in self._tracked:
@@ -102,6 +148,9 @@ class Ducker(threading.Thread):
         if count != self._logged:
             self._logged = count
             log.info("duck: %d audio session(s) matched %s", count, sorted(names))
+        if count == 0 and self.on_no_match and time.monotonic() - self._warned > 8:
+            self._warned = time.monotonic()
+            self.on_no_match(", ".join(tokens))
         self._save_state()
 
     def _apply(self, factor):
@@ -165,8 +214,7 @@ class Ducker(threading.Thread):
                 moving = want or self.ramp.p > 0 or self.ramp._quiet < self.ramp.hold
                 if moving:
                     if not self._tracked or now - self._last_scan > 0.5:
-                        names = {n.strip().lower() for n in cfg["duck_apps"].split(",") if n.strip()}
-                        self._scan(names)
+                        self._scan(normalize_apps(cfg["duck_apps"]))
                         self._last_scan = now
                     self.ramp.step(dt, want)
                     self._apply(self.ramp.factor(cfg["duck_level"] / 100))

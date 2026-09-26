@@ -55,3 +55,21 @@ def test_factor_never_leaves_range():
     for i in range(101):
         ramp.p = i / 100
         assert 0.25 <= ramp.factor(0.25) <= 1.0
+
+
+@pytest.mark.parametrize("typed,expected", [
+    ("/spotify.exe/", ["spotify"]), ("Spotify.exe", ["spotify"]), ("spotify", ["spotify"]),
+    (r"C:\Users\me\AppData\Spotify.exe", ["spotify"]), ('"spotify.exe"', ["spotify"]),
+    ("spotify.exe, chrome.exe; vlc", ["spotify", "chrome", "vlc"]), ("  ,, / ", []), ("", []),
+])
+def test_app_names_are_read_tolerantly(typed, expected):
+    from hermetiks.core.ducking import normalize_apps
+    assert normalize_apps(typed) == expected
+
+
+def test_matching_by_process_name():
+    from hermetiks.core.ducking import app_matches
+    assert app_matches("Spotify.exe", ["spotify"]) and app_matches("spotify.exe", ["spotify"])
+    assert app_matches("chrome.exe", ["chrome"]) and not app_matches("chrome.exe", ["spotify"])
+    assert app_matches("SpotifyHelper.exe", ["spotify"])       # substring for real names
+    assert not app_matches("obs64.exe", ["ob"])                # very short tokens must match exactly

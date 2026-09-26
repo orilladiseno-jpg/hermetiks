@@ -1,6 +1,6 @@
 """HERMETIKS Soundboard - open source numpad soundboard for Windows."""
 
-__version__ = "1.1.0"
+__version__ = "1.1.1"
 
 APP_NAME = "HERMETIKS Soundboard"
 COMPANY = "Orilla Estudio Creativo"

@@ -66,17 +66,24 @@
                  dur: 214000, prog: 62000, playing: true, at: Date.now() });
       return;
     }
-    var interval = opts.interval || 2000;
+    var interval = opts.interval || 2000, failures = 0;
     (function poll() {
       var delay = interval;
-      Promise.resolve().then(opts.source).then(function (t) { message(""); setTrack(t); if (!t) delay = interval * 2; })
+      Promise.resolve().then(opts.source).then(function (t) { failures = 0; message(""); setTrack(t); if (!t) delay = interval * 2; })
         .catch(function (e) {
           if (e && e.code === "auth") { message(opts.authMessage || "Reconnect"); delay = 30000; }
-          else { delay = (e && e.retryAfter) || Math.min(interval * 4, 10000); }
+          else {
+            delay = (e && e.retryAfter) || Math.min(interval * 4, 10000);
+            if (++failures >= 2 && opts.unreachableMessage) message(opts.unreachableMessage);  // never leave OBS blank without saying why
+          }
         }).then(function () { setTimeout(poll, delay); });
     })();
   }
 
   root.HermetiksOverlay = { start: start, localSource: localSource };
-  if (document.body && document.body.getAttribute("data-source") === "local") { start({ source: localSource, interval: 1000 }); }
+  if (document.body && document.body.getAttribute("data-source") === "local") {
+    var where = servedByApp ? location.origin + "/" : BASE;
+    start({ source: localSource, interval: 1000,
+            unreachableMessage: "HERMETIKS is not reachable. Open the app (Now Playing overlay ticked). In OBS use the URL " + where + " as the Browser source URL." });
+  }
 })(window);

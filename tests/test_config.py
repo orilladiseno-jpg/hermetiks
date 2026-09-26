@@ -79,3 +79,8 @@ def test_ancient_flat_config_migrates_and_keeps_the_output_device():
     write({"device": "CABLE Input (VB-Audio Virtual Cable)", "slots": {"97": {"name": "x", "file": ""}}})
     cfg = Config()
     assert cfg["device"].startswith("CABLE Input") and cfg.slot(97)["name"] == "x" and cfg["duck"] is True
+
+
+def test_hand_typed_duck_app_is_cleaned_on_load():
+    write({"version": 3, "duck_apps": "/spotify.exe/", "profiles": {"Main": {"slots": {}}}, "profile": "Main"})
+    assert Config()["duck_apps"] == "spotify"

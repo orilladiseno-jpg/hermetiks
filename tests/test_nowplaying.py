@@ -161,3 +161,15 @@ def test_cors_only_for_file_origin_and_the_website(service):
     assert origin("null") == "null"  # OBS "Local file"
     assert origin("https://hermetiks.orilladiseno.cl") == "https://hermetiks.orilladiseno.cl"
     assert origin("https://evil.example") is None
+
+
+def test_obs_local_file_origin_is_allowed_and_preflight_answers(service):
+    s = service(FakeProvider(TRACK, PNG))
+    req = urllib.request.Request(s.url + "api/now-playing", headers={"Origin": "http://absolute"})
+    with urllib.request.urlopen(req, timeout=5) as r:  # OBS (CEF) serves "Local file" sources from this origin
+        assert r.headers["Access-Control-Allow-Origin"] == "http://absolute"
+    pre = urllib.request.Request(s.url + "api/now-playing", method="OPTIONS",
+                                 headers={"Origin": "http://absolute", "Access-Control-Request-Method": "GET"})
+    with urllib.request.urlopen(pre, timeout=5) as r:
+        assert r.status == 204 and r.headers["Access-Control-Allow-Origin"] == "http://absolute"
+        assert r.headers["Access-Control-Allow-Private-Network"] == "true"

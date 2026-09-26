@@ -22,7 +22,7 @@ def default_path():
 
 DEFAULTS = dict(version=SCHEMA_VERSION, language="en", device="", monitor="", master=100, suppress=False,
                 active=True, close_tray=False, startup=False, hud=True, duck=True, duck_level=30,
-                duck_apps="spotify.exe", nowplaying=True, nowplaying_port=8765,
+                duck_apps="spotify", nowplaying=True, nowplaying_port=8765,
                 stop_key=list(DEFAULT_STOP), profile="Main", profiles={})
 
 
@@ -60,6 +60,8 @@ class Config:
             data["profiles"][data["profile"]] = {"slots": {}}
         if data["profile"] not in data["profiles"]:
             data["profile"] = next(iter(data["profiles"]))
+        from .ducking import normalize_apps  # e.g. a hand-typed "/spotify.exe/" becomes "spotify"
+        data["duck_apps"] = ", ".join(normalize_apps(data.get("duck_apps", ""))) or "spotify"
         data["version"] = SCHEMA_VERSION
         return data
 
@@ -70,8 +72,9 @@ class Config:
             with open(tmp, "w", encoding="utf-8") as f:
                 json.dump(self.data, f, indent=1, ensure_ascii=False)
             os.replace(tmp, self.path)
-        except OSError:
-            pass
+        except OSError as ex:
+            from . import log
+            log.info("could not save settings: %s", ex)
 
     # -- access ----------------------------------------------------------------------------
     def __getitem__(self, key):

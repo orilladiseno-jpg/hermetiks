@@ -113,7 +113,8 @@ class MediaProvider(threading.Thread):
 OVERLAY_FILES = {"/": "index.html", "/index.html": "index.html", "/overlay.css": "overlay.css", "/overlay.js": "overlay.js",
                  "/lockup-white.svg": "lockup-white.svg", "/demo-cover.png": "demo-cover.png"}
 FONTS = {"RethinkSans-Medium.ttf", "RethinkSans-Bold.ttf"}
-ALLOWED_ORIGINS = {"null", "https://hermetiks.orilladiseno.cl"}
+# "null": file:// page; "http://absolute": how OBS (CEF) serves a Browser source set to "Local file"
+ALLOWED_ORIGINS = {"null", "http://absolute", "https://hermetiks.orilladiseno.cl"}
 MIME = {".html": "text/html; charset=utf-8", ".css": "text/css; charset=utf-8", ".js": "application/javascript; charset=utf-8",
         ".svg": "image/svg+xml", ".png": "image/png", ".ttf": "font/ttf"}
 
@@ -157,6 +158,18 @@ def make_handler(provider, port_holder):
             except OSError:
                 return self._send(404, b"Not found", "text/plain")
             self._send(200, body, MIME.get(os.path.splitext(path)[1], "application/octet-stream"), cache)
+
+        def do_OPTIONS(self):  # CORS / Private Network Access preflight
+            origin = self.headers.get("Origin")
+            self.send_response(204)
+            if origin in ALLOWED_ORIGINS:
+                self.send_header("Access-Control-Allow-Origin", origin)
+                self.send_header("Access-Control-Allow-Methods", "GET, OPTIONS")
+                self.send_header("Access-Control-Allow-Headers", "*")
+                self.send_header("Access-Control-Allow-Private-Network", "true")
+                self.send_header("Vary", "Origin")
+            self.send_header("Content-Length", "0")
+            self.end_headers()
 
         def do_GET(self):
             port = port_holder["port"]
