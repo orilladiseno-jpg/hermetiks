@@ -111,7 +111,10 @@ def main():
     outputs = [portable_zip()]
     if not opts.no_installer:
         iscc()
-        outputs.insert(0, os.path.join(DIST, f"Hermetiks-Setup-{__version__}.exe"))
+        versioned = os.path.join(DIST, f"Hermetiks-Setup-{__version__}.exe")
+        stable = os.path.join(DIST, "Hermetiks-Setup.exe")  # stable name for releases/latest/download/
+        shutil.copy2(versioned, stable)
+        outputs[:0] = [versioned, stable]
     checksums(outputs)
 
 

@@ -3,7 +3,7 @@
 ## What we publish
 | File | For |
 |---|---|
-| `Hermetiks-Setup-x.y.z.exe` | Recommended. Per-user install (no admin), Start menu / desktop shortcut, uninstaller. Wizard in English, Spanish and Portuguese. |
+| `Hermetiks-Setup-x.y.z.exe` (and an identical `Hermetiks-Setup.exe`, the stable name used by the website's download button: `releases/latest/download/Hermetiks-Setup.exe`) | Recommended. Per-user install (no admin), Start menu / desktop shortcut, uninstaller. Wizard in English, Spanish and Portuguese. |
 | `Hermetiks-portable-x.y.z.zip` | No install: unzip and run `Hermetiks.exe`. |
 | `SHA256SUMS.txt` | Hashes of both files. |
 

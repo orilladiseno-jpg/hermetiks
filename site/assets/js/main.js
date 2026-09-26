@@ -58,7 +58,6 @@
     .then(function (rel) {
       if (!rel) return;
       var asset = (rel.assets || []).filter(function (a) { return /Setup.*\.exe$/i.test(a.name); })[0];
-      if (asset) $$(".js-download").forEach(function (a) { a.href = asset.browser_download_url; });
       var mb = asset ? " · " + (asset.size / 1048576).toFixed(0) + " MB" : "";
       window.__ver = rel.tag_name + mb;
       var v = $("#ver"); if (v) v.textContent = window.__ver;
